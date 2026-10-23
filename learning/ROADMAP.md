@@ -148,7 +148,7 @@ Your C# and ASP.NET experience means some .NET stages will go quickly. **Skim wh
 
 | Location | Use |
 | --- | --- |
-| `learning/dotnet/` | Recipe Box, created in N1: an ASP.NET Core API project, an xUnit test project, and a Vue app in `learning/dotnet/web/` |
+| `learning/dotnet/` | Recipe Box, created in N1: an ASP.NET Core API project, an NUnit test project, and a Vue app in `learning/dotnet/web/` |
 | `learning/go/` | Go language practice for G0 to G9, one folder per topic. Run with `go run ./<topic>` and test with `go test ./...`. |
 | Ma's Cooking application | Go and Vue from Milestone 0 onward (G9 to G13). The location is decided at Milestone 0. |
 
@@ -213,7 +213,7 @@ This table is the heart of the plan. Every row is something you'll use in ASP.NE
 | Strings | UTF-16; `Length` counts UTF-16 code units | UTF-8 bytes; `len` counts bytes |
 | Dependency injection | The built-in container | None. You wire it by hand in `main`. |
 | Formatting | `dotnet format` and `.editorconfig` | `gofmt` |
-| Testing | xUnit, `[Fact]`, `[Theory]` | The `testing` package and table-driven tests |
+| Testing | NUnit, `[Test]`, `[TestCase]` | The `testing` package and table-driven tests |
 | Web | ASP.NET Core | `net/http` |
 | Data access | NPoco, EF Core, Dapper | `pgx` or `database/sql` with SQL you write |
 
@@ -242,7 +242,7 @@ Recipe Box is a practice app with the same domain as Ma's Cooking: speakers, rec
 **Assumptions to confirm at the first session:**
 
 - Your work uses **controllers** rather than minimal APIs, so the plan builds with controllers and compares them to minimal APIs once.
-- Your work's Vue code may use the Options API. This plan uses the Composition API with `<script setup lang="ts">`.
+- Your work uses **NUnit** for tests and **Vue 3**. This plan follows the conventions Vue 3 recommends: the Composition API with `<script setup lang="ts">`, Vite, Vue Router, and Pinia. Vue 3 also still supports the older Options API (`data()`, `methods`). If your work's components use it, note the differences during V1.
 
 ## N1: Modern C# and the .NET toolchain
 
@@ -260,7 +260,11 @@ Recipe Box is a practice app with the same domain as Ma's Cooking: speakers, rec
 - **LINQ:** Deferred versus immediate execution, so know when `ToList()` matters. Also learn when a plain loop is clearer than a LINQ chain.
 - **`async`/`await`:** A `Task` represents work in progress. `await` releases the thread instead of blocking it. Avoid `.Result` and `.Wait()`. Pass `CancellationToken` all the way down. Know why `async void` is dangerous.
 - **Exceptions:** When to throw, custom exception types, exception filters (`catch (X e) when (...)`), and their cost compared with returning a result.
-- **xUnit:** `[Fact]` for single cases and `[Theory]` with `[InlineData]` for parameterized cases, which is the C# version of Go's table-driven tests.
+- **NUnit:**
+  - `[Test]` marks a single test. `[TestCase(...)]` runs one method once per row of arguments, which is the C# version of Go's table-driven tests. `[TestCaseSource]` supplies rows that are too complex for attribute arguments.
+  - `[SetUp]` and `[TearDown]` run around each test. `[OneTimeSetUp]` and `[OneTimeTearDown]` run once per fixture.
+  - NUnit 4 uses the constraint style: `Assert.That(actual, Is.EqualTo(expected))`. NUnit 3's `Assert.AreEqual` moved to `ClassicAssert`, so older work code may look different.
+  - **By default, NUnit uses one fixture instance for all of its tests**, so instance fields leak state from one test to the next. Reset them in `[SetUp]`, or use `[FixtureLifeCycle(LifeCycle.InstancePerTestCase)]`.
 - **Text:** `string.Length` counts UTF-16 code units. `StringInfo` counts text elements, which approximate what a reader sees as characters. This matters for "title up to 200 characters" in Khmer.
 
 ### Example
@@ -273,12 +277,11 @@ public static class Text
 
 public class TextTests
 {
-    [Theory]
-    [InlineData("", true)]
-    [InlineData(" \t ", true)]
-    [InlineData("សម្ល", false)]
+    [TestCase("", true)]
+    [TestCase(" \t ", true)]
+    [TestCase("សម្ល", false)]
     public void IsBlank_ReturnsExpected(string input, bool expected) =>
-        Assert.Equal(expected, Text.IsBlank(input));
+        Assert.That(Text.IsBlank(input), Is.EqualTo(expected));
 }
 ```
 
@@ -293,9 +296,9 @@ Console.WriteLine(string.Join(", ", shortOnes));
 
 ### Exercises
 
-1. **You:** Create `learning/dotnet/` with a solution, an API project (`dotnet new webapi --use-controllers`), and an xUnit project that references it. Read the generated `Program.cs` and `.csproj` line by line, and write down what you think each line does.
+1. **You:** Create `learning/dotnet/` with a solution, an API project (`dotnet new webapi --use-controllers`), and an NUnit project (`dotnet new nunit`) that references it. Read the generated `Program.cs` and `.csproj` line by line, and write down what you think each line does.
 2. **You:** Enable nullable reference types with warnings treated as errors. Write a `Recipe` record (`Id`, `Title`, `SpeakerName`, `Language`, `Story`, `CreatedAt`) and fix every warning without using `!`.
-3. **You:** Write `CookTime.Format(int minutes)` returning `"1 hr 15 min"`, `"45 min"`, or `"1 hr"`, using a switch expression. Write the `[Theory]` first, including 0, 59, 60, and a negative number. Decide whether a negative input throws or returns a result type, and justify the choice.
+3. **You:** Write `CookTime.Format(int minutes)` returning `"1 hr 15 min"`, `"45 min"`, or `"1 hr"`, using a switch expression. Write the `[TestCase]` rows first, including 0, 59, 60, and a negative number. Decide whether a negative input throws or returns a result type, and justify the choice.
 4. **You:** Run the LINQ example and explain it. Change one thing so that it prints the list as it was when the query was defined.
 5. **You:** Compare `"ខ្មែរ".Length` with `new StringInfo("ខ្មែរ").LengthInTextElements`, predicting both first. Save your answers; you'll compare them with Go in G1.
 
@@ -304,9 +307,10 @@ Console.WriteLine(string.Join(", ", shortOnes));
 - What does `<Nullable>enable</Nullable>` guarantee, and what doesn't it guarantee?
 - When does a LINQ query actually run?
 - What does `await` do to the calling thread?
-- How does `[Theory]` relate to a table-driven test?
+- How does `[TestCase]` relate to a table-driven test?
+- Why can an instance field in an NUnit fixture make one test affect another?
 
-**References:** [What's new in C#](https://learn.microsoft.com/dotnet/csharp/whats-new/), [Nullable reference types](https://learn.microsoft.com/dotnet/csharp/nullable-references), [Asynchronous programming](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/), [LINQ](https://learn.microsoft.com/dotnet/csharp/linq/), [Unit testing with xUnit](https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit)
+**References:** [What's new in C#](https://learn.microsoft.com/dotnet/csharp/whats-new/), [Nullable reference types](https://learn.microsoft.com/dotnet/csharp/nullable-references), [Asynchronous programming](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/), [LINQ](https://learn.microsoft.com/dotnet/csharp/linq/), [Unit testing with NUnit](https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-nunit), [NUnit documentation](https://docs.nunit.org/)
 
 ---
 
@@ -381,7 +385,7 @@ public sealed class SpeakersController(SpeakerBook book) : ControllerBase
 
    **Keep these notes.** G9 asks you to reproduce or deliberately change each behavior by hand.
 3. **You:** Rewrite one endpoint as a minimal API. What did the controller give you that the minimal version doesn't?
-4. **You:** Write tests for `RecipeBook` with `[Theory]`, then write a test that calls `Add` from 100 tasks with `Parallel.ForEachAsync` and checks the count. Remove the lock and watch the test. Is the failure reliable? Compare that with Go's race detector later.
+4. **You:** Write tests for `RecipeBook` with `[TestCase]`, then write a test that calls `Add` from 100 tasks with `Parallel.ForEachAsync` and checks the count. Remove the lock and watch the test. Is the failure reliable? Compare that with Go's race detector later.
 5. **You:** Add a `CancellationToken` to a deliberately slow endpoint, using `Task.Delay(5000, ct)`. Cancel `curl` midway and look at what gets logged.
 6. **Vue:** Do V2 against this API.
 
@@ -715,8 +719,8 @@ app.Use(async (context, next) =>
 ### Concepts
 
 - **The test levels:**
-  - **Unit tests** with xUnit for validation and formatting.
-  - **API tests** with `WebApplicationFactory<Program>`, which runs the real pipeline in memory. If the compiler says `Program` is inaccessible, add `public partial class Program;`.
+  - **Unit tests** with NUnit for validation and formatting.
+  - **API tests** with `WebApplicationFactory<Program>`, which runs the real pipeline in memory. In NUnit, create it in `[OneTimeSetUp]` and dispose it in `[OneTimeTearDown]`. If the compiler says `Program` is inaccessible, add `public partial class Program;`.
   - **Integration tests** against real PostgreSQL. Use a test database, or [Testcontainers](https://dotnet.testcontainers.org/) to start a disposable container per test run.
   - Reset data between tests with a `TRUNCATE` helper, or a library such as Respawn.
 - **What CRUD tests must cover:** Every documented status code, validation edge cases (empty values, exact limits, multi-byte text), conflicts, authorization, and the constraint backstop.
@@ -806,7 +810,7 @@ Vue work happens inside whichever backend's project you're working on. Recipe Bo
   - Typed `defineProps` and `defineEmits`, and `v-model` on components.
   - `v-for` with stable keys, `v-if` versus `v-show`, and lifecycle hooks.
   - Vue DevTools.
-  - If your work uses the Options API, map each concept across to it.
+  - These are Vue 3's recommended conventions. If your work's components use the Options API, compare one component written both ways.
 - **Exercises:** Build a static `RecipeCard` component and a list that renders sample data. Add a filter box using `computed`. Explain exactly what reacts when you type.
 - **Checkpoint:** When do you use `ref` and when `reactive`? Why do list items need stable keys?
 - **References:** [Vue guide](https://vuejs.org/guide/introduction.html), [TypeScript with the Composition API](https://vuejs.org/guide/typescript/composition-api.html)
@@ -972,7 +976,7 @@ func main() {
 - **`defer`:** Runs when the function returns, in last-in, first-out order, with **arguments evaluated immediately**. It's Go's `using` and `finally`.
 - **Tests:**
   - `func TestXxx(t *testing.T)`. `t.Errorf` reports and continues, and `t.Fatalf` reports and stops.
-  - **Table-driven tests** with `t.Run` subtests are Go's `[Theory]`.
+  - **Table-driven tests** with `t.Run` subtests are Go's version of NUnit's `[TestCase]`.
   - `t.Helper()` marks helper functions.
   - `go test -run Name -v`, `-count=1`, and `-cover`.
   - Watch a test fail before trusting it.
@@ -1522,7 +1526,7 @@ Everything from N6 and N7 applies. The difference is that you now see the SQL, t
 
 1. **You:** Fuzz `ValidateRecipe` and the JSON decoding helper, and keep any crashing inputs as regular tests.
 2. **You:** Have your pair plant a bug in the Ma's Cooking service, then find it with tests, logs, and Delve.
-3. **Reflect:** Compare the testing experience in xUnit with `WebApplicationFactory` and in Go with `httptest`. Which was faster to write, faster to run, and clearer when it failed?
+3. **Reflect:** Compare the testing experience in NUnit with `WebApplicationFactory` and in Go with `httptest`. Which was faster to write, faster to run, and clearer when it failed?
 
 **References:** [Tutorial: Getting started with fuzzing](https://go.dev/doc/tutorial/fuzz), [Delve](https://github.com/go-delve/delve/blob/master/Documentation/cli/getting_started.md), [Go coverage](https://go.dev/doc/build-cover)
 
@@ -1558,6 +1562,7 @@ Everything from N6 and N7 applies. The difference is that you now see the SQL, t
 | Implicit `[Required]` from nullable reference types | Unexpected 400 responses | Make it optional on purpose with `string?` |
 | An interpolated string in a log message | Logs lose their structured fields | Use message templates |
 | Middleware in the wrong order | CORS or authentication silently not applied | Follow the documented order |
+| Instance fields in an NUnit fixture | Tests pass alone but fail together | Reset in `[SetUp]`, or use `[FixtureLifeCycle(LifeCycle.InstancePerTestCase)]` |
 
 ### Vue
 
