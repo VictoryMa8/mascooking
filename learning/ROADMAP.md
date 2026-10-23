@@ -1,92 +1,111 @@
-# Go study roadmap: from first function to a well-made CRUD API
+# Study roadmap: ASP.NET Core with the lid off
 
-A senior engineer's study plan for learning the Go you need to build a well-made CRUD application: one that is correct, tested, safe with input, honest about failures, and easy to explain. It is written for a junior developer with beginner-to-intermediate experience in **Python, JavaScript, SQL, HTML, CSS, and C++**.
+A senior engineer's study plan for a developer whose work stack is **C# and ASP.NET Core with Vue**. It has two goals:
 
-You can use this plan in two ways:
+1. **Reinforce the work stack.** About three quarters of study time goes to C#, ASP.NET Core, NPoco, PostgreSQL, and Vue, by building a practice app called **Recipe Box**.
+2. **Learn what the framework hides.** About one quarter goes to **barebones Go** with Vue, rebuilding by hand what ASP.NET Core does automatically: routing, model binding, dependency injection, middleware, data mapping, authentication, and shutdown. The Go work is the real product, **Ma's Cooking**.
 
-- **Read it on your own.** Work through each stage, type the examples yourself, do the exercises, and answer the checkpoint questions.
-- **Pair-program with an agent.** Open a session, point the agent at the current stage, and follow the [pairing protocol](#pairing-with-an-agent). The agent teaches and reviews, and you write the code.
+The method throughout is **learn it with the framework, then build it without one.** You use a concept in ASP.NET Core first, where it's familiar and fast. Then you write the same thing in plain Go and see what was happening underneath.
 
-This is a curriculum, not a project-state document. [STATUS](../docs/STATUS.md) owns the current task, [LEARNING](../docs/LEARNING.md) owns evidence of what you have actually learned, and the [project roadmap](../docs/ROADMAP.md) owns Ma's Cooking milestones. Reading a stage or finishing an exercise with heavy help doesn't count as mastery. Record honest evidence in LEARNING.
+You can read this plan on your own, or follow it in sessions with an agent using the [pairing protocol](#pairing-with-an-agent).
+
+This is a curriculum, not a project-state document:
+
+- [STATUS](../docs/STATUS.md) owns the current task.
+- [LEARNING](../docs/LEARNING.md) owns evidence of what you've actually learned.
+- The [project roadmap](../docs/ROADMAP.md) owns the Ma's Cooking milestones.
+- [ADR 0001](../docs/decisions/0001-go-api-database-boundary.md) still applies: Ma's Cooking is Vue, Go, and PostgreSQL. ASP.NET Core is for practice only.
 
 ## Contents
 
 - [What "well made" means](#what-well-made-means)
+- [Splitting your time](#splitting-your-time)
 - [How to use this plan](#how-to-use-this-plan)
-- [Your existing languages, translated](#your-existing-languages-translated)
-- [Stage overview](#stage-overview)
-- Part I: The language
-  - [Stage 0: Toolchain and workflow](#stage-0-toolchain-and-workflow)
-  - [Stage 1: Values, types, and control flow](#stage-1-values-types-and-control-flow)
-  - [Stage 2: Functions and the testing habit](#stage-2-functions-and-the-testing-habit)
-  - [Stage 3: Slices, maps, and strings](#stage-3-slices-maps-and-strings)
-  - [Stage 4: Structs, methods, and pointers](#stage-4-structs-methods-and-pointers)
-  - [Stage 5: Errors as values](#stage-5-errors-as-values)
-  - [Stage 6: Interfaces, packages, and a little generics](#stage-6-interfaces-packages-and-a-little-generics)
-- Part II: Programs that touch the world
-  - [Stage 7: Files, JSON, and a CLI recipe box](#stage-7-files-json-and-a-cli-recipe-box)
-  - [Stage 8: Just enough concurrency for servers](#stage-8-just-enough-concurrency-for-servers)
-- Part III: Building the service
-  - [Stage 9: HTTP with net/http](#stage-9-http-with-nethttp)
-  - [Stage 10: Structuring and running the service](#stage-10-structuring-and-running-the-service)
-  - [Stage 11: PostgreSQL for application developers](#stage-11-postgresql-for-application-developers)
-  - [Stage 12: Go and PostgreSQL together](#stage-12-go-and-postgresql-together)
-  - [Stage 13: Making CRUD well made](#stage-13-making-crud-well-made)
-  - [Stage 14: Testing, debugging, and tooling](#stage-14-testing-debugging-and-tooling)
-- Part IV: Capstone
-  - [Stage 15: Recipe Box API capstone](#stage-15-recipe-box-api-capstone)
-- [Bridge to Ma's Cooking](#bridge-to-mas-cooking)
-- Appendices: [Gotchas](#appendix-a-gotchas-cheat-sheet), [Idioms](#appendix-b-idioms-and-style), [Glossary](#appendix-c-glossary), [References](#appendix-d-references)
+- [What ASP.NET Core hides, and where Go shows it](#what-aspnet-core-hides-and-where-go-shows-it)
+- [C# to Go translation](#c-to-go-translation)
+- [Phase plan](#phase-plan)
+- [.NET track (about 75%, with Vue)](#net-track)
+  - [N1: Modern C# and the .NET toolchain](#n1-modern-c-and-the-net-toolchain)
+  - [N2: The ASP.NET Core request path](#n2-the-aspnet-core-request-path)
+  - [N3: PostgreSQL for application developers](#n3-postgresql-for-application-developers)
+  - [N4: Data access with Npgsql and NPoco](#n4-data-access-with-npgsql-and-npoco)
+  - [N5: The framework's machinery](#n5-the-frameworks-machinery)
+  - [N6: Making CRUD well made](#n6-making-crud-well-made)
+  - [N7: Identity and access](#n7-identity-and-access)
+  - [N8: Testing and operations](#n8-testing-and-operations)
+  - [N9: Recipe Box capstone](#n9-recipe-box-capstone)
+- [Vue track (shared by both backends)](#vue-track)
+  - [V1: Vue 3, TypeScript, and Vite](#v1-vue-3-typescript-and-vite) · [V2: Talking to an API](#v2-talking-to-an-api) · [V3: Routing and forms](#v3-routing-and-forms) · [V4: State and structure](#v4-state-and-structure) · [V5: Authentication in the browser](#v5-authentication-in-the-browser) · [V6: Testing and quality](#v6-testing-and-quality)
+- [Go track (about 25%, with Vue)](#go-track)
+  - Language: [G0](#g0-toolchain-and-workflow) · [G1](#g1-values-types-and-control-flow) · [G2](#g2-functions-and-the-testing-habit) · [G3](#g3-slices-maps-and-strings) · [G4](#g4-structs-methods-and-pointers) · [G5](#g5-errors-as-values) · [G6](#g6-interfaces-packages-and-a-little-generics) · [G7](#g7-files-json-and-a-small-cli) · [G8](#g8-just-enough-concurrency)
+  - By hand: [G9: HTTP](#g9-http-by-hand) · [G10: Service plumbing](#g10-service-plumbing-by-hand) · [G11: PostgreSQL](#g11-postgresql-by-hand-with-pgx) · [G12: Quality and access](#g12-quality-and-access-by-hand) · [G13: Testing and debugging](#g13-testing-and-debugging-go)
+- Appendices: [Gotchas](#appendix-a-gotchas) · [Go idioms](#appendix-b-go-idioms-for-a-c-developer) · [Glossary](#appendix-c-glossary) · [References](#appendix-d-references)
 
 ## What "well made" means
 
-By the end, you should be able to build and explain a CRUD API that:
+Both backends aim for the same standard. A well-made CRUD application:
 
-1. **Works:** creates, reads, lists, updates, and deletes records through HTTP and JSON, backed by PostgreSQL.
+1. **Works:** creates, reads, lists, updates, and deletes records through HTTP and JSON, backed by PostgreSQL, with a Vue frontend that handles loading, empty, and error states.
 2. **Has a clear contract:** predictable routes, status codes, a consistent JSON error shape, and documented behavior.
 3. **Distrusts input:** validates at the boundary, limits request size, uses parameterized SQL, and backs up rules with database constraints.
 4. **Fails honestly:** distinguishes "not found", "invalid", "conflict", and "our fault", logs the details internally, and reveals nothing sensitive to clients.
-5. **Is tested at the right levels:** unit tests for rules, handler tests for HTTP behavior, and integration tests against a real database.
-6. **Is safe under concurrency:** has no data races, passes request contexts and timeouts through, and uses transactions where several writes must succeed or fail together.
+5. **Is tested at the right levels:** unit tests for rules, HTTP-level tests, and integration tests against a real database.
+6. **Is safe under concurrency:** has no data races, passes cancellation through to the database, and uses transactions where several writes must succeed or fail together.
 7. **Can be operated:** configuration comes from the environment, logs are structured, the server shuts down gracefully, a health check works, and a stranger can run it from the README.
-8. **Is conventional Go:** formatted by `gofmt`, uses the standard library first, keeps SQL visible, and avoids abstractions before they're needed.
-9. **Is understood:** you can trace a request from `curl` to a database row and back, and justify each design choice.
+8. **Is conventional for its stack:** idiomatic ASP.NET Core in C#, idiomatic standard-library Go, SQL kept visible, and no abstractions before they're needed.
+9. **Is understood:** you can trace a request from the browser to a database row and back, and say which parts the framework did and which parts you did.
 
-Item 9 matters as much as the rest. A working app you can't explain means the learning goal hasn't been met.
+The second half of item 9 is the reason the Go track exists.
+
+## Splitting your time
+
+**The ratio.** Plan in cycles of four sessions: **three .NET + Vue sessions, then one Go + Vue session.** If you plan by hours instead, 8 hours a week becomes 6 hours of .NET and 2 of Go.
+
+**The order within a cycle.** The .NET sessions come first. The Go session at the end of the cycle tackles the same idea, or the next Go language topic while the Go track catches up.
+
+**Vue counts toward the backend it's paired with.** Vue work on Recipe Box counts as .NET time, and Vue work on Ma's Cooking counts as Go time.
+
+**Balance over a month, not a day.** If a Go session runs long or a .NET topic takes an extra session, adjust the next cycle. A useful line to keep in [STATUS](../docs/STATUS.md) is `Split, last 8 sessions: 6 .NET / 2 Go`.
+
+**Expect the Go track to lag.** Go needs language foundations (G0 to G8) before it can show you anything about HTTP. Early on, Go sessions teach the language while .NET sessions are already building APIs. From Phase 5 onward, Go sessions rebuild concepts you've been using in ASP.NET for weeks. That lag helps: you'll know exactly what you're replacing.
+
+**Know the tradeoff.** Ma's Cooking, the product, advances only during Go sessions, so its milestones will take about four times as long in calendar time as they would full time. Recipe Box rehearses each slice in ASP.NET first, so each Go session should go faster than starting cold. If product progress starts to matter more, change the ratio deliberately and record it in STATUS.
 
 ## How to use this plan
 
 ### Pacing
 
-Advance by **checkpoint, not calendar**. A stage is done when you can do its checkpoint tasks with documentation open but without step-by-step help. Some stages take one session; Stages 9 and 12 may take several. Going back to an earlier stage is normal and expected.
+Advance by **checkpoint, not calendar**. A stage is done when you can do its checkpoint tasks with documentation open but without step-by-step help. Going back to an earlier stage is normal and expected.
+
+Your C# and ASP.NET experience means some .NET stages will go quickly. **Skim what you already know, but do the checkpoint anyway.** Daily use of a framework often hides gaps in the fundamentals underneath, and those gaps are exactly what this plan targets.
 
 ### Reading it alone
 
 1. Read the stage's "Why it matters" and "Concepts" sections.
-2. **Type** every example rather than pasting it. Before running it, write down what you expect it to print.
+2. **Type** every example rather than pasting it, and predict its output before running it.
 3. Do the exercises in order. Each one is small on purpose.
-4. Answer the checkpoint questions out loud or in writing, without notes. Any question you can't answer tells you what to reread.
+4. Answer the checkpoint questions out loud or in writing, without notes.
 5. The references are optional. Use them when a concept needs a second explanation.
 
 ### Pairing with an agent
 
-The project's [AGENTS.md](../AGENTS.md) sets the collaboration modes. The Go foundations phase uses **PAIR** mode, which means small examples from the agent alternating with changes from you.
+[AGENTS.md](../AGENTS.md) defines three collaboration modes: COACH, PAIR, and UNBLOCK. The Go foundations phase uses **PAIR**. **No mode has been agreed for the .NET track yet.** Choose one at the first .NET session and record it in STATUS and AGENTS.md. PAIR mirrors the Go track. COACH suits topics you already know well.
 
 **Session loop (about 45 to 90 minutes):**
 
 1. **Warm-up.** The agent asks you to explain the last concept in two or three sentences.
-2. **One concept.** The agent explains a single idea, connects it to Python, JavaScript, or C++, and shows an example of at most about 15 lines. The example uses different data than your exercise.
+2. **One concept.** The agent explains a single idea and shows an example of at most about 15 lines. The example uses different data than your exercise. In Go sessions, the agent connects the idea to what ASP.NET does.
 3. **Predict.** You say what the code will do before running it.
-4. **Change.** You make the next exercise change yourself. The agent doesn't edit your exercise files unless you explicitly switch to UNBLOCK.
+4. **Change.** You make the exercise change yourself. The agent doesn't edit your exercise files unless you explicitly switch to UNBLOCK.
 5. **Run and explain.** You run it and explain why it behaved the way it did.
-6. **Review.** The agent reviews your change like a pull request: correctness first, then idiomatic Go, then tests. It points out problems and lets you fix them rather than rewriting your code.
-7. **Record.** At a stopping point, update [STATUS](../docs/STATUS.md) and add honest evidence to [LEARNING](../docs/LEARNING.md).
+6. **Review.** The agent reviews your change like a pull request: correctness first, then idiomatic style, then tests. It points out problems and lets you fix them.
+7. **Record.** At a stopping point, update STATUS, including the time split, and add honest evidence to LEARNING.
 
 **Hint ladder.** When you're stuck, the agent goes up one rung at a time and stops as soon as you're moving again:
 
 1. A question that points you at the problem.
-2. The name of the relevant concept or package documentation.
-3. A concrete hint, such as "look at what `append` returns."
+2. The name of the relevant concept or documentation page.
+3. A concrete hint.
 4. A partial snippet using different names than your code.
 5. A full solution, only in UNBLOCK mode and followed by an explanation.
 
@@ -94,7 +113,11 @@ The project's [AGENTS.md](../AGENTS.md) sets the collaboration modes. The Go fou
 
 - Start or resume a stage:
 
-  > We're on Stage N of learning/ROADMAP.md in PAIR mode. Read AGENTS.md, STATUS.md, and LEARNING.md, inspect my code, then teach the next concept. Show at most one small example, then stop and let me predict and implement.
+  > We're on stage <N2, V3, or G9> of learning/ROADMAP.md. Read AGENTS.md, STATUS.md, and LEARNING.md, inspect my code, then teach the next concept. Show at most one small example, then stop and let me predict and implement.
+
+- Start a Go session that pulls back the curtain:
+
+  > We're on G<n>. First ask me how ASP.NET Core handles this. Then show what the Go standard library gives us and what we'll have to write ourselves. Stop before I implement.
 
 - Ask for a hint:
 
@@ -102,7 +125,7 @@ The project's [AGENTS.md](../AGENTS.md) sets the collaboration modes. The Go fou
 
 - Ask for a review:
 
-  > Review my change in <file> like a senior engineer: correctness first, then idiomatic Go, then tests. Don't rewrite it; point out issues and let me fix them.
+  > Review my change in <file> like a senior engineer: correctness first, then idiomatic <C#/Go/Vue>, then tests. Don't rewrite it; point out issues and let me fix them.
 
 - Debug:
 
@@ -110,964 +133,314 @@ The project's [AGENTS.md](../AGENTS.md) sets the collaboration modes. The Go fou
 
 - Run a checkpoint:
 
-  > Quiz me on the Stage N checkpoint. One question at a time. Don't give the answer until I've tried.
+  > Quiz me on the <stage> checkpoint. One question at a time. Don't give the answer until I've tried.
 
 **Rules for the agent:**
 
 - Teach one concept per step and stop after each example.
 - Don't write solutions to the developer's exercises. Example code must use different names and data than the exercise.
 - Code written by the agent is not evidence of the developer's skill. Don't record it in LEARNING as if it were.
-- Connect new ideas to Python, JavaScript, or C++ when that genuinely helps.
+- In Go sessions, always connect back to what the developer knows from ASP.NET Core.
 - When debugging, establish the cause before suggesting a replacement.
-- Reconfirm the collaboration mode before moving from practice code into Ma's Cooking application code.
+- Reconfirm the collaboration mode before moving from Go practice into Ma's Cooking application code.
 
 ### Where the code lives
 
-| Location | Use | Notes |
-| --- | --- | --- |
-| `learning/go/` | Stages 0 to 6 | The existing practice module, which has no dependencies. Put each topic in its own folder, such as `learning/go/collections/`, and run it with `go run ./collections`. Run every test with `go test ./...`. |
-| `learning/recipebox/` | Stages 7 to 15 if you build the practice capstone | A separate module created in Stage 7, because it will eventually depend on `pgx`. |
-| Ma's Cooking application | Milestone 0 onward | The location is decided at Milestone 0. See [Bridge to Ma's Cooking](#bridge-to-mas-cooking). |
+| Location | Use |
+| --- | --- |
+| `learning/dotnet/` | Recipe Box, created in N1: an ASP.NET Core API project, an xUnit test project, and a Vue app in `learning/dotnet/web/` |
+| `learning/go/` | Go language practice for G0 to G9, one folder per topic. Run with `go run ./<topic>` and test with `go test ./...`. |
+| Ma's Cooking application | Go and Vue from Milestone 0 onward (G9 to G13). The location is decided at Milestone 0. |
 
-In the agent sandbox, Go's default build cache may be read-only. [STATUS](../docs/STATUS.md) records the `GOCACHE` workaround. A normal terminal usually doesn't need it.
+Local tools found on this machine:
 
-## Your existing languages, translated
+- .NET SDK 10, Node 24, Docker, and Go 1.27.
+- `psql` isn't installed. Use the one inside the PostgreSQL container (see N3).
+- In the agent sandbox, Go may need the `GOCACHE` workaround recorded in [STATUS](../docs/STATUS.md).
 
-Use this table as a map, not a rulebook. The biggest mental shifts are marked in bold.
+## What ASP.NET Core hides, and where Go shows it
 
-| Topic | Python | JavaScript | C++ | Go |
+This table is the heart of the plan. Every row is something you'll use in ASP.NET first and then build in Go.
+
+| Concept | ASP.NET Core does it for you with | In Go, you write | Learn it in | Rebuild it in |
 | --- | --- | --- | --- | --- |
-| Typing | Dynamic | Dynamic | Static | Static, with type inference (`x := 5`) |
-| Running code | Interpreter | Node or browser runtime | Compile and link | Compiles to a single native binary; `go run` compiles and runs in one step |
-| Dependencies | pip, venv | npm, `package.json` | CMake, vcpkg, or similar | `go.mod` and `go.sum`; `go get`, `go mod tidy` |
-| Missing value | `None` | `undefined` and `null` | Uninitialized or `nullptr` | **Every type has a zero value** (`0`, `""`, `false`, `nil`). Nothing is ever uninitialized. |
-| Classes | `class` | `class` and prototypes | `class` | **No classes.** Structs plus methods. |
-| Inheritance | Yes | Yes | Yes | **None.** Composition through embedding. |
-| Polymorphism | Duck typing | Duck typing | Virtual functions and templates | **Interfaces satisfied implicitly**, which is duck typing checked at compile time |
-| Failures | Exceptions | `throw` and rejected promises | Exceptions or error codes | **Errors are ordinary return values.** `panic` is reserved for bugs. |
-| Cleanup | `with` | `try`/`finally` | RAII and destructors | `defer` |
-| Lists | `list` | `Array` | `std::vector` | Slices (`[]T`) |
-| Dictionaries | `dict` | `Object` and `Map` | `std::unordered_map` | Maps (`map[K]V`) |
-| Strings | Unicode code points | UTF-16 code units | Bytes | **Immutable UTF-8 bytes.** `len` counts bytes, not characters. |
-| Memory | Garbage collected | Garbage collected | Manual or RAII | Garbage collected. Pointers exist, but there is no pointer arithmetic. |
-| Concurrency | Threads, asyncio, GIL | Event loop, `async`/`await` | Threads | **Goroutines and channels.** Blocking code is normal and cheap. |
-| Visibility | Convention (`_name`) | Modules and `#private` | `public` and `private` | **Capitalized names are exported** from the package. Lowercase names are package-private. |
-| Formatting | black and ruff | prettier | clang-format | `gofmt`, which everyone uses. There's nothing to argue about. |
-| Generics | Type hints | TypeScript | Templates | Type parameters, used sparingly |
+| Server and hosting | `WebApplication`, Kestrel, the generic host | `http.Server` with timeouts and `ListenAndServe` | N2 | G9 |
+| Routing | Attribute routes and constraints such as `{id:long}` | `ServeMux` patterns and parsing `r.PathValue("id")` yourself | N2 | G9 |
+| Model binding | `[FromBody]`, `[FromRoute]`, `[FromQuery]`, and type conversion | `json.Decoder`, `MaxBytesReader`, `strconv` | N2 | G9 |
+| Automatic 400 responses | `[ApiController]` checks `ModelState` and returns `ValidationProblemDetails` | A validator function and an error writer | N2, N6 | G9, G12 |
+| Implicit required fields | Non-nullable reference properties are treated as `[Required]` | Explicit checks, plus pointers to detect missing fields | N2 | G7, G12 |
+| JSON output | Output formatters, camelCase by default | A `writeJSON` helper and `json` struct tags | N2 | G9 |
+| Exceptions to HTTP errors | `UseExceptionHandler`, `IExceptionHandler`, `ProblemDetails` | Errors as values, mapped explicitly; recovery middleware | N5 | G5, G10 |
+| Dependency injection | The container, lifetimes, and per-request scopes | Wiring constructors by hand in `main` | N5 | G10 |
+| Configuration | Layered `IConfiguration`, options, user secrets | `os.Getenv`, a config struct, validation at startup | N5 | G10 |
+| Logging | `ILogger<T>`, providers, message templates, scopes | `log/slog`, passing the logger in | N5 | G10 |
+| Middleware pipeline | `app.Use...` and ordering rules | `func(http.Handler) http.Handler` chains | N5 | G10 |
+| Graceful shutdown | The host handles `SIGTERM`; `IHostApplicationLifetime` | `signal.NotifyContext` and `srv.Shutdown` | N5 | G10 |
+| Health checks | `AddHealthChecks`, `MapHealthChecks` | A handler that pings the pool with a timeout | N5 | G11 |
+| Connection pooling | Npgsql pools connections behind each connection string | Creating and closing a `pgxpool.Pool` explicitly | N4 | G11 |
+| Row mapping | NPoco maps columns to properties by reflection and generates INSERT and UPDATE statements | Writing the SQL and scanning each column | N4 | G11 |
+| Transactions | `db.GetTransaction()`, `Complete()`, rollback when disposed | `Begin`, `defer Rollback`, `Commit` | N4 | G11 |
+| Optimistic concurrency | NPoco's `[VersionColumn]` throws `DBConcurrencyException` | `WHERE version = $2` and checking `RowsAffected` | N6 | G12 |
+| Cancellation | A `CancellationToken` parameter is injected from `HttpContext.RequestAborted` | Passing `r.Context()` to every call | N2, N4 | G8, G11 |
+| Concurrent requests | Kestrel runs requests on the thread pool | Every request gets a goroutine; you protect shared state | N2 | G8, G9 |
+| Authentication | Cookie handler, Data Protection, `ClaimsPrincipal` | A sessions table, `crypto/rand` tokens, cookie flags, middleware | N7 | G12 |
+| Authorization | `[Authorize]`, policies, `IAuthorizationService` | Ownership checks in SQL and handlers | N7 | G12 |
+| HTTP testing | `WebApplicationFactory<Program>` | `httptest.NewRecorder` and `httptest.NewServer` | N8 | G9, G13 |
+| API documentation | OpenAPI generated from the code | A hand-written `API.md` or OpenAPI file | N2 | G12 |
 
-## Stage overview
+**Rule for every Go session:** before writing code, say out loud how ASP.NET Core handles this and what you'll have to write yourself.
 
-| Stage | Theme | You can... |
+## C# to Go translation
+
+| Topic | C# and .NET | Go |
 | --- | --- | --- |
-| 0 | Toolchain | Create a module, then run, build, test, format, and vet code |
-| 1 | Values and control flow | Write typed code with zero values, loops, and switches, and explain bytes versus runes |
-| 2 | Functions and tests | Write table-driven tests and use multiple return values, closures, and `defer` |
-| 3 | Collections | Use slices and maps correctly, including aliasing and nil behavior |
-| 4 | Structs and pointers | Model data, choose value or pointer receivers, and build an in-memory store |
-| 5 | Errors | Return, wrap, inspect, and design errors, including validation errors |
-| 6 | Interfaces and packages | Use small interfaces and design packages without premature abstraction |
-| 7 | I/O and JSON | Build a file-backed CLI that does CRUD on recipes |
-| 8 | Concurrency | Protect shared state, use the race detector, and pass `context.Context` |
-| 9 | HTTP | Build a JSON CRUD API with `net/http` and test it with `httptest` |
-| 10 | Service structure | Wire configuration, logging, middleware, and graceful shutdown |
-| 11 | PostgreSQL | Design schemas with constraints and migrations, and inspect data with `psql` |
-| 12 | Go and PostgreSQL | Use `pgx`, map errors across layers, write transactions and integration tests |
-| 13 | Quality | Add validation, pagination, optimistic locking, an error contract, and an authorization preview |
-| 14 | Testing and debugging | Plan a test strategy and use fuzzing, the race detector, coverage, and Delve |
-| 15 | Capstone | Ship and explain a well-made recipe CRUD API |
+| Building and running | `dotnet build` and `dotnet run`, `.csproj` files, solutions | `go build` and `go run`, `go.mod`, no project files |
+| Dependencies | NuGet and `PackageReference` | Modules, `go get`, `go.sum` |
+| Organization | Namespaces and assemblies | Packages (one per directory) and modules |
+| Visibility | `public`, `internal`, `private` | **Capitalized names are exported.** Lowercase names are private to the package. An `internal/` directory restricts imports. |
+| Types | Classes (reference types), structs, records | **Structs only.** They're values and are copied on assignment. |
+| Inheritance | Yes | **No.** Embedding gives you composition. |
+| Interfaces | Declared explicitly (`: IRecipeStore`) | **Satisfied implicitly.** Defined by the code that consumes them. |
+| Null | Nullable reference types and `null` | **Zero values.** `nil` exists only for pointers, slices, maps, channels, functions, and interfaces. |
+| Properties | `{ get; set; }` | Plain fields. Write methods only when you need behavior. |
+| Construction | Constructors, primary constructors, object initializers | Composite literals and `NewX` functions |
+| Failures | Exceptions | **Error values** returned alongside results |
+| Cleanup | `using` and `IDisposable` | `defer` |
+| Asynchrony | `async`/`await`, `Task`, the thread pool | **Goroutines.** Ordinary blocking calls; no function coloring. |
+| Cancellation | `CancellationToken` | `context.Context` |
+| Locking | `lock`, `ConcurrentDictionary` | `sync.Mutex` around a map |
+| Collections | `List<T>`, `Dictionary<K,V>`, LINQ | Slices, maps, `for` loops, the `slices` and `maps` packages |
+| Strings | UTF-16; `Length` counts UTF-16 code units | UTF-8 bytes; `len` counts bytes |
+| Dependency injection | The built-in container | None. You wire it by hand in `main`. |
+| Formatting | `dotnet format` and `.editorconfig` | `gofmt` |
+| Testing | xUnit, `[Fact]`, `[Theory]` | The `testing` package and table-driven tests |
+| Web | ASP.NET Core | `net/http` |
+| Data access | NPoco, EF Core, Dapper | `pgx` or `database/sql` with SQL you write |
+
+## Phase plan
+
+Each phase is a few cycles of four sessions. Go stages trail the .NET concepts until Phase 5, then mirror them.
+
+| Phase | .NET + Vue (about 75%) | Go + Vue (about 25%) | Phase outcome |
+| --- | --- | --- | --- |
+| 1. Foundations | N1, V1 | G0 to G2 | A Recipe Box solution with tests; Go basics with table-driven tests |
+| 2. First API | N2, V2 | G3 to G4 | In-memory Recipe Box CRUD API with a Vue list page; Go collections and structs |
+| 3. Data | N3, N4 | G5 to G6 | Recipe Box on PostgreSQL through NPoco; Go errors and interfaces |
+| 4. Machinery | N5, V3 | G7 to G8, then the **Go readiness review** | Production-style plumbing in ASP.NET; Vue forms and routing; Go foundations done |
+| 5. Well-made CRUD | N6, V4 | G9 to G10: **Ma's Cooking Milestone 0** starts | A well-made Recipe Box API; a Go HTTP API that Vue can call |
+| 6. Identity | N7, V5 | G11: Milestone 0 database health, then **Milestone 1** | Authentication in ASP.NET; a Go recipe round trip on PostgreSQL |
+| 7. Ship | N8, N9, V6 | G12 to G13: toward **Milestone 2** | The Recipe Box capstone; Go ownership and testing |
 
 ---
 
-# Part I: The language
+<a id="net-track"></a>
 
-## Stage 0: Toolchain and workflow
+# .NET track (about 75%, with Vue)
 
-> **Current progress:** Partly done. The practice module exists, the program runs, and two tests pass. See [STATUS](../docs/STATUS.md).
+Recipe Box is a practice app with the same domain as Ma's Cooking: speakers, recipes, and stories in their original language. Rehearsing each slice here makes the Go product sessions faster. It isn't the product, so feel free to experiment.
 
-**Why it matters for CRUD:** Every later stage depends on a fast loop of editing, running, and testing. Go's tooling is simple and standard, so learn it once and you'll use it everywhere.
+**Assumptions to confirm at the first session:**
 
-### Concepts
+- Your work uses **controllers** rather than minimal APIs, so the plan builds with controllers and compares them to minimal APIs once.
+- Your work's Vue code may use the Options API. This plan uses the Composition API with `<script setup lang="ts">`.
 
-- **Module:** A versioned unit of code defined by `go.mod`. The `module` line gives its import path, and the `go` line sets the minimum language version. Third-party dependencies are listed in `go.mod` and verified by `go.sum`.
-- **Package:** One directory is one package. Every file in a directory declares the same `package` name. `package main` with a `func main()` builds an executable. Any other package name is a library.
-- **Core commands:**
-  - `go run .` compiles and runs the package in the current directory.
-  - `go build` produces a binary.
-  - `go test ./...` runs tests in every package below the current directory.
-  - `go vet ./...` catches suspicious code, such as wrong `Printf` verbs or copied locks.
-  - `gofmt -l .` lists files that aren't formatted. Most editors format on save.
-  - `go doc strings.TrimSpace` shows documentation in the terminal.
-  - `go mod tidy` adds missing dependencies and removes unused ones.
-- **Strict compiler:** Unused imports and unused local variables are compile errors. This keeps code clean, and you'll find it annoying at first.
-- **Editor support:** `gopls`, the Go language server used by the Go extension in VS Code and Cursor, provides completion, go-to-definition, and inline errors.
+## N1: Modern C# and the .NET toolchain
 
-### Coming from
-
-- **Python and JavaScript:** There's no virtualenv or `node_modules` per project. Dependencies go into a shared module cache, and the module file pins versions.
-- **C++:** There are no headers, makefiles, or linker flags for ordinary programs. `go build` handles everything.
-
-### Exercises
-
-1. **You:** Explain each line of `learning/go/go.mod` in your own words.
-2. **You:** Run `go build` in `learning/go/`, run the resulting binary directly, and compare that with `go run .`. Where did the binary go, and why does it matter for deployment?
-3. **You:** Add an unused variable and an unused import, read both compiler errors, and remove them. Why might the Go designers have made these errors instead of warnings?
-4. **You:** Misformat a file deliberately, run `gofmt -l .`, then `gofmt -w .`.
-5. **You:** Run `go doc fmt` and `go doc fmt.Printf`. Find the formatting verb that prints a Go-syntax representation of a value.
-
-### Checkpoint
-
-- What is the difference between a module and a package?
-- What makes a Go program executable?
-- How does `go test` find tests?
-- Without notes: create a new folder with a `main` package, run it, and add a passing test.
-
-**References:** [Tutorial: Get started](https://go.dev/doc/tutorial/getting-started), [How to write Go code](https://go.dev/doc/code), [Organizing a Go module](https://go.dev/doc/modules/layout)
-
----
-
-## Stage 1: Values, types, and control flow
-
-**Why it matters for CRUD:** Request fields, IDs, timestamps, and limits are all typed values. Zero values decide what a missing JSON field becomes. Byte and character counting decides what "title up to 200 characters" means for a Khmer recipe title.
+**Why it matters:** Work code often lags the language. Knowing modern C# well, especially nullable reference types, records, pattern matching, `async`, and LINQ's deferred execution, makes you faster at work, and it gives you a precise baseline to compare Go against.
 
 ### Concepts
 
-- **Declarations:**
-  - `var servings int` declares a variable that starts at its zero value, 0.
-  - `title := "Kuy teav"` declares a variable and infers its type. `:=` works only inside functions.
-  - `const maxTitleLen = 200` declares a compile-time constant.
-- **Basic types:** `int`, `int64`, `float64`, `bool`, `string`, `byte` (an alias for `uint8`), and `rune` (an alias for `int32`, holding one Unicode code point).
-- **Zero values:** `0`, `""`, `false`, and `nil` for pointers, slices, maps, channels, functions, and interfaces. Go code is designed so that the zero value is useful.
-- **Explicit conversion:** Go never converts between numeric types implicitly. Write `float64(n)` and `int64(id)`. Use `strconv.Itoa(n)` to turn a number into its text. `string(n)` produces the character with that code point, not the number as text.
-- **Strings are UTF-8 bytes:**
-  - `len(s)` counts bytes.
-  - `utf8.RuneCountInString(s)` counts code points.
-  - `for i, r := range s` walks runes. Each `i` is a byte offset.
-  - What a reader perceives as one character (a grapheme) can be several runes. Khmer often combines them. The standard library doesn't count graphemes.
-- **Control flow:**
-  - `for` is the only loop: `for i := 0; i < n; i++`, `for condition {}`, `for {}`, `for i := range 10` (range over an integer), and `for k, v := range collection`.
-  - `if` takes an optional short statement: `if n := len(s); n > 200 { ... }`.
-  - `switch` cases don't fall through, and a `switch` with no condition replaces long `if`/`else` chains.
-- **Formatting verbs:** `%v` prints the value, `%+v` adds struct field names, `%#v` prints Go syntax, `%q` quotes strings, `%T` prints the type, and `%d` prints integers.
-- **Scope and shadowing:** `:=` in an inner block creates a *new* variable with the same name. This is a frequent source of bugs, especially with `err`.
-
-### Coming from
-
-- **Python:** There is no truthiness. Write `if s != ""`, not `if s`. Integer division truncates (`7/2 == 3`).
-- **JavaScript:** There is no `undefined`, no type coercion, and no `==` versus `===` distinction. `"5" + 1` doesn't compile.
-- **C++:** Zero values replace uninitialized memory, and there are no implicit narrowing conversions. `i++` is a statement, not an expression, so `x = i++` doesn't compile.
+- **The `dotnet` CLI:**
+  - `dotnet new` creates projects and solutions, and `dotnet add reference` and `dotnet add package` connect them.
+  - `dotnet build`, `dotnet run`, `dotnet watch`, `dotnet test`, and `dotnet format` cover the daily loop.
+  - Look at what a `.csproj` file actually contains and what an SDK-style project infers on its own.
+- **Nullable reference types:** Turn on `<Nullable>enable</Nullable>` and `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`. Understand `?`, `!`, and flow analysis. Note that annotations are compile-time only: `null` can still arrive at runtime from JSON or a database.
+- **Records and immutability:** `record` and `record struct`, `init`, `required`, and `with` expressions. Records compare by value.
+- **Pattern matching:** Switch expressions, property patterns, and relational patterns (`< 0`, `>= 60`).
+- **LINQ:** Deferred versus immediate execution, so know when `ToList()` matters. Also learn when a plain loop is clearer than a LINQ chain.
+- **`async`/`await`:** A `Task` represents work in progress. `await` releases the thread instead of blocking it. Avoid `.Result` and `.Wait()`. Pass `CancellationToken` all the way down. Know why `async void` is dangerous.
+- **Exceptions:** When to throw, custom exception types, exception filters (`catch (X e) when (...)`), and their cost compared with returning a result.
+- **xUnit:** `[Fact]` for single cases and `[Theory]` with `[InlineData]` for parameterized cases, which is the C# version of Go's table-driven tests.
+- **Text:** `string.Length` counts UTF-16 code units. `StringInfo` counts text elements, which approximate what a reader sees as characters. This matters for "title up to 200 characters" in Khmer.
 
 ### Example
 
-```go
-package main
-
-import (
-	"fmt"
-	"unicode/utf8"
-)
-
-func main() {
-	var servings int    // zero value
-	title := "Kuy teav" // inferred string
-	language := "ខ្មែរ"
-
-	fmt.Println(servings, title)
-	fmt.Println(len(language))                    // predict before running
-	fmt.Println(utf8.RuneCountInString(language)) // predict before running
-	for i, r := range language {
-		fmt.Printf("byte %d: %q\n", i, r)
-	}
+```csharp
+public static class Text
+{
+    public static bool IsBlank(string? s) => string.IsNullOrWhiteSpace(s);
 }
+
+public class TextTests
+{
+    [Theory]
+    [InlineData("", true)]
+    [InlineData(" \t ", true)]
+    [InlineData("សម្ល", false)]
+    public void IsBlank_ReturnsExpected(string input, bool expected) =>
+        Assert.Equal(expected, Text.IsBlank(input));
+}
+```
+
+Predict the output of this snippet:
+
+```csharp
+var titles = new List<string> { "Amok", "Kuy teav" };
+var shortOnes = titles.Where(t => t.Length < 6);
+titles.Add("Bobor");
+Console.WriteLine(string.Join(", ", shortOnes));
 ```
 
 ### Exercises
 
-1. **You:** Run the example and predict both counts first. Explain why the byte offsets jump.
-2. **You:** In a new folder, write `spiceLevel(n int) string` that returns `"mild"`, `"medium"`, `"hot"`, or `"unknown"` using a `switch` with no condition. Choose the ranges yourself.
-3. **You:** Write a loop that prints the numbers 1 to 5 using `range` over an integer, then rewrite it as a classic three-part `for`.
-4. **You:** Create a shadowing bug: declare `count := 0`, then inside an `if` block write `count := 5`. Print `count` after the block and explain the result. Run `go vet`. Does it catch this?
-5. **Discuss:** If a product rule says "title up to 200 characters", should Go count bytes, runes, or graphemes? What would each choice mean for Khmer, Mandarin, and English titles?
+1. **You:** Create `learning/dotnet/` with a solution, an API project (`dotnet new webapi --use-controllers`), and an xUnit project that references it. Read the generated `Program.cs` and `.csproj` line by line, and write down what you think each line does.
+2. **You:** Enable nullable reference types with warnings treated as errors. Write a `Recipe` record (`Id`, `Title`, `SpeakerName`, `Language`, `Story`, `CreatedAt`) and fix every warning without using `!`.
+3. **You:** Write `CookTime.Format(int minutes)` returning `"1 hr 15 min"`, `"45 min"`, or `"1 hr"`, using a switch expression. Write the `[Theory]` first, including 0, 59, 60, and a negative number. Decide whether a negative input throws or returns a result type, and justify the choice.
+4. **You:** Run the LINQ example and explain it. Change one thing so that it prints the list as it was when the query was defined.
+5. **You:** Compare `"ខ្មែរ".Length` with `new StringInfo("ខ្មែរ").LengthInTextElements`, predicting both first. Save your answers; you'll compare them with Go in G1.
 
 ### Checkpoint
 
-- What is the zero value of `string`, `int`, `bool`, `[]string`, and `*int`?
-- Why does `len("ខ្មែរ")` differ from the number of characters you see?
-- When does `:=` create a new variable rather than assign to an existing one?
+- What does `<Nullable>enable</Nullable>` guarantee, and what doesn't it guarantee?
+- When does a LINQ query actually run?
+- What does `await` do to the calling thread?
+- How does `[Theory]` relate to a table-driven test?
 
-**References:** [A Tour of Go: Basics](https://go.dev/tour/basics/1), [Strings, bytes, runes and characters in Go](https://go.dev/blog/strings), [Go by Example](https://gobyexample.com/)
-
----
-
-## Stage 2: Functions and the testing habit
-
-**Why it matters for CRUD:** Handlers and stores are functions that return results and errors. Tests are how you prove CRUD behavior instead of clicking around. Make them a habit now, while the code is simple.
-
-### Concepts
-
-- **Multiple return values:** `func divide(a, b int) (int, error)`. This is the foundation of Go's error handling.
-- **Named results:** Use them sparingly, mainly for documentation. Avoid bare `return` in long functions.
-- **Variadic functions:** `func join(parts ...string)`. Call it as `join("a", "b")` or `join(parts...)`.
-- **Functions as values and closures:** Functions can be assigned, passed, and returned, and they capture variables from the surrounding scope. Middleware in Stage 10 is built from this.
-- **`defer`:** Schedules a call to run when the surrounding function returns. Deferred calls run in last-in, first-out order, and **their arguments are evaluated immediately**. It's used for cleanup such as `defer f.Close()`, `defer mu.Unlock()`, and `defer tx.Rollback(ctx)`.
-- **Early returns:** Handle a failure and `return` immediately, so the successful path stays at the left margin.
-- **Testing basics:**
-  - Test files end in `_test.go`, and test functions look like `func TestXxx(t *testing.T)`.
-  - `t.Errorf` reports a failure and keeps going. `t.Fatalf` reports and stops the test. Use `Fatalf` when the rest of the test can't run meaningfully.
-  - **Table-driven tests** list cases in a slice of structs and run each one with `t.Run(name, ...)` as a subtest.
-  - `t.Helper()` makes failures in helper functions report the caller's line.
-  - `go test -run TestName -v` runs one test with verbose output. `-count=1` bypasses cached results, and `-cover` shows coverage.
-  - Write failure messages in the form `got X, want Y`, including the inputs.
-  - **Watch a test fail before trusting it.** Break the code briefly and confirm the test notices.
-
-### Coming from
-
-- **Python:** `pytest.mark.parametrize` is the closest match to table-driven tests. There are no fixtures. Use plain helper functions and `t.Cleanup`.
-- **JavaScript:** There's no Jest or Mocha and no `describe` or `it`. `t.Run` gives you nesting, and `testing` is built into the toolchain.
-- **C++:** There's no test framework to install. `defer` covers much of what RAII destructors do, but explicitly and per function.
-
-### Example
-
-The function under test is different from your exercises:
-
-```go
-func isBlank(s string) bool {
-	return strings.TrimSpace(s) == ""
-}
-
-func TestIsBlank(t *testing.T) {
-	tests := []struct {
-		name  string
-		input string
-		want  bool
-	}{
-		{name: "empty", input: "", want: true},
-		{name: "spaces and tabs", input: " \t ", want: true},
-		{name: "khmer word", input: "សម្ល", want: false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := isBlank(tt.input); got != tt.want {
-				t.Errorf("isBlank(%q) = %v, want %v", tt.input, got, tt.want)
-			}
-		})
-	}
-}
-```
-
-### Exercises
-
-1. **You:** Merge the two existing `recipeLabel` tests into one table-driven test with named subtests. Run `go test -v` and look at how subtest names appear.
-2. **You:** Break `recipeLabel` deliberately, for example by removing the parentheses. Is the failure message good enough to find the problem without opening the code? Improve it if not, then restore the function.
-3. **You:** Write `cookTime(minutes int) string` that formats `75` as `"1 hr 15 min"`, `45` as `"45 min"`, and `60` as `"1 hr"`. Write the table test **first**, including the edge cases 0 and 59. Negative input is handled in Stage 5.
-4. **You:** Predict the output, then run it:
-
-   ```go
-   func main() {
-   	for i := range 3 {
-   		defer fmt.Println("deferred", i)
-   	}
-   	fmt.Println("done")
-   }
-   ```
-
-5. **You:** Write `newCounter() func() int`, which returns a closure that counts up on each call. Test that two counters don't share state.
-
-### Checkpoint
-
-- Why are table-driven tests the default in Go?
-- When do you use `t.Fatalf` instead of `t.Errorf`?
-- When are a deferred call's arguments evaluated? In what order do deferred calls run?
-- Without notes: write a table-driven test with three cases for a function you've never seen.
-
-**References:** [Tutorial: Add a test](https://go.dev/doc/tutorial/add-a-test), [`testing` package](https://pkg.go.dev/testing), [Defer, panic, and recover](https://go.dev/blog/defer-panic-and-recover)
+**References:** [What's new in C#](https://learn.microsoft.com/dotnet/csharp/whats-new/), [Nullable reference types](https://learn.microsoft.com/dotnet/csharp/nullable-references), [Asynchronous programming](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/), [LINQ](https://learn.microsoft.com/dotnet/csharp/linq/), [Unit testing with xUnit](https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit)
 
 ---
 
-## Stage 3: Slices, maps, and strings
+## N2: The ASP.NET Core request path
 
-**Why it matters for CRUD:** A list endpoint returns a slice. An in-memory store is a map. Query parameters and request fields are strings to parse. Slice aliasing and nil maps cause real production bugs.
-
-### Concepts
-
-- **Arrays versus slices:**
-  - `[3]string` is an array. Its size is part of its type, it's copied by value, and you'll rarely use it directly.
-  - `[]string` is a slice: a small header holding a pointer to a backing array, a length, and a capacity.
-- **`make` and `append`:**
-  - `make([]T, len, cap)` creates a slice and `make(map[K]V)` creates a map.
-  - `append` may allocate a new backing array, so **always assign its result**: `s = append(s, x)`.
-- **Aliasing:** Slicing (`s[1:3]`) shares the backing array, so writes through one slice can show up in another. Use `slices.Clone` or `copy` when you need independence.
-- **Nil versus empty slices:** `var s []T` is nil and `s := []T{}` is empty. Both have length 0 and both work with `range` and `append`, but **JSON encodes a nil slice as `null` and an empty slice as `[]`**. Your Vue client will care.
-- **The `slices` package:** `slices.Contains`, `slices.Index`, `slices.Sort`, `slices.SortFunc`, `slices.Delete`, and `slices.Clone`.
-- **Maps:**
-  - `v, ok := m[k]` is the "comma ok" form. It tells "missing" apart from "present with the zero value".
-  - `delete(m, k)` removes a key.
-  - **Iteration order is randomized**, so sort the keys when order matters: `slices.Sorted(maps.Keys(m))`.
-  - **Writing to a nil map panics.** Reading from one returns the zero value.
-  - Maps aren't safe for concurrent writes (Stage 8).
-- **The `strings` package:** `TrimSpace`, `Fields`, `Split`, `Contains`, `ToLower`, `EqualFold`, and `strings.Builder` for efficient concatenation.
-- **The `strconv` package:** `Atoi` and `ParseInt` parse text into numbers and return an error on bad input. `Itoa` and `FormatInt` go the other way. You'll parse path IDs and `?limit=` values with these.
-
-### Coming from
-
-- **Python:** Slicing a list copies it. Slicing a Go slice shares memory, which is closer to a NumPy view.
-- **JavaScript:** Map iteration order isn't insertion order, unlike JavaScript's `Map`.
-- **C++:** A slice is roughly a `std::span` that can grow. `append` behaves like `vector::push_back` and may reallocate, but the old slice header still points at the old array.
-
-### Example: predict before running
-
-```go
-a := []string{"rice", "fish", "lime"}
-b := a[:2]
-b = append(b, "chili")
-fmt.Println(a) // ?
-fmt.Println(len(b), cap(b))
-
-var counts map[string]int
-fmt.Println(counts["khmer"]) // ?
-counts["khmer"]++            // ?
-```
-
-### Exercises
-
-1. **You:** Run the example and explain each output using length, capacity, and the backing array.
-2. **You:** Write `countByLanguage(languages []string) map[string]int` with table tests. How do you compare two maps in a test? Look at `maps.Equal`.
-3. **You:** Write `normalizeTags(tags []string) []string`, which trims, lowercases, removes duplicates, and sorts, without modifying the caller's slice. Write a test that proves the input is unchanged.
-   - **Discuss:** Normalizing *search tags* is fine. Why would normalizing a cook's *story or transcript* violate [ADR 0002](../docs/decisions/0002-preserve-original-content.md)?
-4. **You:** Build a tiny store using `map[int]string` that maps an ID to a title, with `add`, `get` (using comma ok), `remove`, and `listSorted` functions. This previews CRUD.
-5. **You:** Parse `"20"`, `"abc"`, and `"-5"` with `strconv.Atoi` and print the value and error for each.
-
-### Checkpoint
-
-- Why must you write `s = append(s, x)` rather than just `append(s, x)`?
-- What's the difference between a nil slice and an empty slice, and when does it matter?
-- What happens when you write to a nil map? When you read from one?
-- Why can a test that ranges over a map pass sometimes and fail other times?
-
-**References:** [Go slices: usage and internals](https://go.dev/blog/slices-intro), [Go maps in action](https://go.dev/blog/maps), [`slices` package](https://pkg.go.dev/slices), [`strings` package](https://pkg.go.dev/strings)
-
----
-
-## Stage 4: Structs, methods, and pointers
-
-**Why it matters for CRUD:** A recipe is a struct. Stores and handlers are structs with methods. Choosing between a value and a pointer decides whether an update actually changes anything.
+**Why it matters:** This is the CRUD-over-HTTP layer you use every day at work. The goal here is to **notice every decision the framework makes for you**, because in G9 you'll make each of them yourself.
 
 ### Concepts
 
-- **Structs:** `type Recipe struct { ... }`. Create them with composite literals that name each field (`Recipe{Title: "Kuy teav"}`). Fields you leave out get their zero values. Structs are copied when you assign or pass them.
-- **Methods:** A method is a function with a receiver, `func (r Recipe) Label() string`. Methods can be defined on any named type in your package, not only structs.
-- **Value or pointer receiver:**
-  - Use a pointer receiver (`func (b *Book) Add(...)`) when the method mutates the receiver, when the struct is large, or when it contains a mutex.
-  - Use a value receiver for small values that methods only read.
-  - **Be consistent within a type.** If any method needs a pointer receiver, give them all one.
-- **Pointers:** `&x` takes an address and `*p` dereferences it. There's no pointer arithmetic, and the garbage collector manages memory. **Returning a pointer to a local variable is safe.** Escape analysis moves it to the heap, which is the opposite of a dangling pointer in C++. Dereferencing a nil pointer panics.
-- **Constructors:** Go has no constructors. By convention, write `func NewRecipeBook() *RecipeBook` when the zero value isn't usable, for example because a map needs `make`. Make the zero value useful where you can.
-- **Exported versus unexported:** `Title` is visible outside the package and `nextID` isn't. Visibility is per package, not per type.
-- **Embedding:** Putting a type inside a struct without a field name promotes its fields and methods. This is composition, not inheritance. You'll use it in Stage 10 to wrap `http.ResponseWriter`.
-- **Struct tags:** Metadata strings such as `` `json:"title"` ``, read by packages like `encoding/json`. Covered in Stage 7.
-
-### Coming from
-
-- **Python and JavaScript:** There's no `self` or `this` keyword. The receiver is an ordinary named parameter. Objects aren't shared by reference automatically: assigning a struct copies it.
-- **C++:** It's like a `struct` with member functions, but without constructors, destructors, overloading, or inheritance. A pointer receiver is like a non-`const` member function, and a value receiver is like a `const` one that works on a copy.
-
-### Example
-
-This uses a different type than your exercises:
-
-```go
-type Speaker struct {
-	Name     string
-	Relation string
-}
-
-func (s Speaker) Describe() string { // reads only: value receiver
-	return s.Name + " (" + s.Relation + ")"
-}
-
-func (s *Speaker) Rename(name string) { // mutates: pointer receiver
-	s.Name = name
-}
-
-func main() {
-	speakers := []Speaker{{Name: "Ma", Relation: "mother"}, {Name: "Yay", Relation: "grandmother"}}
-	for _, s := range speakers {
-		s.Rename("Changed")
-	}
-	fmt.Println(speakers) // predict: did anything change?
-}
-```
-
-### Exercises
-
-1. **You:** Run the example and explain the result. Then rewrite the loop so the rename actually changes the slice.
-2. **You:** Define `Recipe` with `ID int64`, `Title`, `Speaker`, `Language`, `Story string`, and `CreatedAt time.Time`. Replace `recipeLabel` with a `Label()` method and update its tests. Why is a value receiver appropriate here?
-3. **You:** Build `RecipeBook`, an in-memory store containing a `map[int64]Recipe` and a `nextID`. Give it these methods, each with tests:
-   - `Add(r Recipe) Recipe` assigns an ID and a creation time.
-   - `Get(id int64) (Recipe, bool)`
-   - `List() []Recipe` sorts by ID.
-   - `Update(r Recipe) bool`
-   - `Delete(id int64) bool`
-
-   You'll reuse this store through Stage 10.
-4. **You:** Temporarily change `Add` to a value receiver and watch the tests fail. Explain why.
-5. **Discuss:** Should `Get` return `Recipe` or `*Recipe`? What could a caller do to the store's internal data with a pointer?
-6. **You:** Try `p := &book.recipes[1]`. Read the compiler error and explain why Go forbids taking the address of a map element.
-
-### Checkpoint
-
-- When do you use a pointer receiver?
-- Why is it safe to return `&localVar` in Go?
-- What does the zero value of `RecipeBook` look like, and why does it need a constructor?
-- What's the difference between embedding and inheritance?
-
-**References:** [A Tour of Go: Methods](https://go.dev/tour/methods/1), [Effective Go: Pointers vs. values](https://go.dev/doc/effective_go#pointers_vs_values), [Go FAQ: Should I define methods on values or pointers?](https://go.dev/doc/faq#methods_on_values_or_pointers)
-
----
-
-## Stage 5: Errors as values
-
-**Why it matters for CRUD:** Every CRUD failure has to become the right HTTP response. A missing recipe is 404, bad input is 400 or 422, a stale edit is 409, and a database outage is 500 or 503. You can only do that if errors carry meaning that survives as they move up through your layers.
-
-### Concepts
-
-- **`error` is an interface:** Anything with an `Error() string` method is an error. Return it as the last result. `nil` means success.
-- **Check, add context, return:**
-
-  ```go
-  r, err := store.Get(id)
-  if err != nil {
-  	return fmt.Errorf("load recipe %d: %w", id, err)
-  }
-  ```
-
-  `%w` wraps the original error so callers can still inspect it. `%v` flattens it into text.
-- **Sentinel errors:** Package-level values such as `var ErrNotFound = errors.New("recipe not found")`. Check them with `errors.Is(err, ErrNotFound)`, which looks through any wrapping. Don't compare error strings.
-- **Custom error types:** Use a struct when callers need data from the error, such as which fields failed validation. Extract it with `errors.As`.
-- **Handle each error once:** Either handle it, by logging it and responding, or return it with context. **Don't do both.** Logging and also returning produces duplicate log noise.
-- **`panic` is for bugs:** Use it for impossible states and programmer mistakes, not for expected failures like bad input or a missing row. `recover` belongs only at boundaries such as HTTP middleware.
-- **`errors.Join`** combines several errors into one.
-- **Validation is not mutation:** A validator reports problems and doesn't silently change what the user wrote.
-
-### Coming from
-
-- **Python and JavaScript:** There's no `try`/`except` or `throw`/`catch`. Every failure point is visible in the code. The price is verbosity. The benefit is that you can see and test every failure path, which is exactly what an API needs.
-- **C++:** It's like returning error codes, but with rich values and wrapping. `std::expected` in C++23 is the closest match.
-
-### Example
-
-```go
-var ErrNotFound = errors.New("not found")
-
-type ValidationError struct {
-	Fields map[string]string // field name -> problem
-}
-
-func (e *ValidationError) Error() string {
-	return fmt.Sprintf("invalid input: %d field(s)", len(e.Fields))
-}
-
-// At a boundary, for example an HTTP handler:
-func describe(err error) string {
-	var verr *ValidationError
-	switch {
-	case errors.Is(err, ErrNotFound):
-		return "missing"
-	case errors.As(err, &verr):
-		return fmt.Sprintf("invalid: %v", verr.Fields)
-	default:
-		return "unexpected"
-	}
-}
-```
-
-**The nil interface trap.** Predict whether `check("Kuy teav") == nil`:
-
-```go
-func check(title string) error {
-	var verr *ValidationError
-	if title == "" {
-		verr = &ValidationError{Fields: map[string]string{"title": "required"}}
-	}
-	return verr
-}
-```
-
-An interface value is only `nil` when both its type and its value are nil. A nil `*ValidationError` stored in an `error` is not nil. The fix is to return a literal `nil` on success.
-
-### Exercises
-
-1. **You:** Change `RecipeBook.Get` to return `(Recipe, error)` with a wrapped `ErrNotFound`. Update the tests to use `errors.Is`. Do the same for `Update` and `Delete`.
-2. **You:** Change `cookTime` to return `(string, error)` and reject negative minutes. Add test cases for the error.
-3. **You:** Write `ValidateRecipe(r Recipe) error`, returning a `*ValidationError` that lists **every** failing field, not only the first:
-   - The title is required and at most 200 runes.
-   - The speaker and language are required.
-   - The story is optional and **must never be trimmed or rewritten** (see [ADR 0002](../docs/decisions/0002-preserve-original-content.md)).
-
-   Include Khmer and Mandarin cases in the tests.
-4. **You:** Wrap an error through three function layers and print it. Read the message chain. Does `errors.Is` still find the sentinel?
-5. **You:** Reproduce the nil interface trap in a test, then fix it.
-
-### Checkpoint
-
-- When do you use `errors.Is` and when do you use `errors.As`?
-- What do you lose if you wrap with `%v` instead of `%w`?
-- Why shouldn't you both log an error and return it?
-- When, if ever, is `panic` appropriate in a web service?
-
-**References:** [Error handling and Go](https://go.dev/blog/error-handling-and-go), [Working with errors in Go 1.13](https://go.dev/blog/go1.13-errors), [`errors` package](https://pkg.go.dev/errors)
-
----
-
-## Stage 6: Interfaces, packages, and a little generics
-
-**Why it matters for CRUD:** `http.Handler`, `io.Reader`, and `error` are all interfaces, and the standard library is built from small ones. Package boundaries decide what your HTTP code and storage code are allowed to know about each other.
-
-### Concepts
-
-- **Implicit interfaces:** A type satisfies an interface by having its methods. There's no `implements` keyword. Small interfaces are the most useful: `io.Reader` (one method), `io.Writer` (one method), `fmt.Stringer`, `error`, and `http.Handler`.
-- **Define interfaces where they're used:** The code that *needs* a behavior declares a small interface for exactly that need. The code that provides it returns a concrete type. The saying is "accept interfaces, return structs".
-- **Don't create interfaces in advance:** Add one when you have two implementations or a real testing need, not because it feels like good architecture. A Java-style interface for every service is a common mistake when coming from other languages.
-- **Compile-time check:** `var _ Getter = (*RecipeBook)(nil)` fails to compile if `RecipeBook` stops satisfying `Getter`.
-- **`any`, type assertions, and type switches:** `any` is the empty interface. `v, ok := x.(string)` asserts a type, and `switch v := x.(type)` branches on it. These are rare in application code.
-- **Packages:**
-  - Use short, lowercase package names with no underscores.
-  - Avoid stutter: write `recipes.Store`, not `recipes.RecipeStore`.
-  - An `internal/` directory can't be imported from outside its parent.
-  - **Import cycles are compile errors.** Design the direction of dependencies on purpose: the HTTP layer depends on storage, never the other way round.
-- **Doc comments:** A comment directly above an exported name, starting with that name, becomes its documentation.
-- **Generics:** `func Filter[T any](items []T, keep func(T) bool) []T`. They're useful for containers and algorithms like those in `slices` and `maps`. They're rarely the right tool for business logic or a "generic repository".
-
-### Coming from
-
-- **Python:** It's duck typing that the compiler checks, or `typing.Protocol` enforced at build time.
-- **JavaScript and TypeScript:** It's TypeScript's structural typing, applied to methods.
-- **C++:** It's like an abstract base class, except the concrete type never names it. Go generics are simpler and more restricted than templates.
-
-### Example
-
-```go
-// The consumer declares only what it needs.
-type recipeGetter interface {
-	Get(id int64) (Recipe, error)
-}
-
-func printTitle(w io.Writer, g recipeGetter, id int64) error {
-	r, err := g.Get(id)
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprintln(w, r.Title)
-	return err
-}
-```
-
-`printTitle` works with `os.Stdout`, a `bytes.Buffer` in tests, a file, or an HTTP response, because all of them are `io.Writer`s.
-
-### Exercises
-
-1. **You:** Implement `String()` on `Recipe` and print one with `%v` and `%s`. What changed?
-2. **You:** Write `printAll(w io.Writer, recipes []Recipe) error`. Test it with a `bytes.Buffer`, then call it with `os.Stdout`.
-3. **You:** Move `Recipe`, `RecipeBook`, and the validation into a package at `learning/go/recipebook/` and call it from a `main` package. Fix whatever breaks. What did capitalization have to do with it?
-4. **You:** Write a fake `recipeGetter` in a test that always returns `ErrNotFound`, and test `printTitle`'s error path. Then **discuss**: was the interface worth it here, or would the real `RecipeBook` have been simpler?
-5. **You:** Write a generic `Map[T, U any](items []T, f func(T) U) []U`. Then find a place where a plain `for` loop reads better.
-
-### Checkpoint
-
-- How does a type satisfy an interface in Go?
-- Why define interfaces in the consuming package?
-- When does an interface become premature abstraction?
-- What is an import cycle, and how do you avoid one?
-
-**References:** [Effective Go: Interfaces](https://go.dev/doc/effective_go#interfaces), [Go Code Review Comments: Interfaces](https://go.dev/wiki/CodeReviewComments#interfaces), [Tutorial: Generics](https://go.dev/doc/tutorial/generics), [When to use generics](https://go.dev/blog/when-generics)
-
----
-
-# Part II: Programs that touch the world
-
-## Stage 7: Files, JSON, and a CLI recipe box
-
-**Why it matters for CRUD:** JSON is your API's language. Building CRUD as a command-line tool first separates "how data is shaped, validated, and stored" from "how HTTP works". When you add HTTP in Stage 9, only the transport changes.
-
-> **Mini-capstone.** Create `learning/recipebox/` as a new module with `go mod init example.com/recipebox`. Stages 7 to 15 grow inside it.
-
-### Concepts
-
-- **`io.Reader` and `io.Writer` everywhere:** Files, network connections, HTTP bodies, and buffers all implement them.
-- **Files:**
-  - `os.ReadFile` and `os.WriteFile` cover small files.
-  - `os.Open` plus `defer f.Close()` is for streaming.
-  - `errors.Is(err, fs.ErrNotExist)` detects a missing file.
-  - `t.TempDir()` gives each test a clean directory.
-- **`encoding/json`:**
-  - `json.Marshal` and `json.Unmarshal` convert whole values. `json.NewEncoder` and `json.NewDecoder` stream.
-  - Struct tags rename fields: `` `json:"createdAt"` ``. `omitempty` skips zero values, and `-` skips a field entirely.
-  - **Only exported fields are encoded.** Unexported fields are silently ignored.
-  - `time.Time` is encoded as an RFC 3339 string.
-  - **Missing JSON fields become zero values.** You can't tell "not sent" from "sent empty" unless you use a pointer field (`*string`).
-  - `Decoder.DisallowUnknownFields()` rejects fields you don't recognize.
-  - A nil slice encodes as `null` (see Stage 3).
-- **Separate the wire format from internal types:** Request and response structs, such as `createRecipeRequest`, are the API contract. Internal structs are free to change. Mixing them couples the database, the domain, and the API.
-- **Command-line basics:** `os.Args`, the `flag` package (with `flag.NewFlagSet` per subcommand), writing errors to `os.Stderr`, and `os.Exit(1)` on failure.
-
-### Example
-
-```go
-type Recipe struct {
-	ID        int64     `json:"id"`
-	Title     string    `json:"title"`
-	Language  string    `json:"language"`
-	Story     string    `json:"story,omitempty"`
-	CreatedAt time.Time `json:"createdAt"`
-	draft     bool      // unexported: never appears in JSON
-}
-
-// Optional fields for a partial update: nil means "not sent".
-type patchRecipeRequest struct {
-	Title *string `json:"title"`
-	Story *string `json:"story"`
-}
-```
-
-### Exercises
-
-1. **You:** Marshal a `Recipe` with and without tags, and with an empty `Story`. Compare the outputs.
-2. **You:** Unmarshal `{"title": "Amok", "colour": "green"}` into a `Recipe`. Where did `colour` go? Now decode it with `DisallowUnknownFields` and read the error.
-3. **You:** Unmarshal `{}` into `patchRecipeRequest` and into a struct without pointers. Explain why the pointers matter for a partial update.
-4. **You:** Write `Save(path string, recipes []Recipe) error` and `Load(path string) ([]Recipe, error)`. A missing file means an empty list, not an error. Test the round trip with `t.TempDir()`.
-5. **You:** Build the CLI:
-
-   ```text
-   recipebox add -title "Kuy teav" -speaker "Ma" -language Khmer
-   recipebox list
-   recipebox show 1
-   recipebox edit 1 -title "Kuy teav Phnom Penh"
-   recipebox delete 1
-   ```
-
-   Reuse your `RecipeBook`, validation, and errors from earlier stages. Errors go to stderr with exit code 1. Test the logic, not `main`.
-6. **Stretch:** Make saving atomic by writing to a temporary file and then renaming it. Why does that protect the data if the program crashes mid-write?
-
-### Checkpoint
-
-- Why should API request and response structs be separate from internal types?
-- How do you tell a missing JSON field from an empty one?
-- What happens to unexported fields during marshaling?
-- Without notes: add a new field to the CLI end to end, covering the flag, the struct, validation, JSON, and a test.
-
-> **Readiness review.** After this stage, revisit the Go foundations exit criteria in the [project roadmap](../docs/ROADMAP.md): implement a modest program with occasional hints, handle a failure, write useful tests, and explain data flow and design choices. Assess this through your work, record the evidence in LEARNING, and decide the [track](#bridge-to-mas-cooking) and collaboration mode for the next stages.
-
-**References:** [JSON and Go](https://go.dev/blog/json), [`encoding/json` package](https://pkg.go.dev/encoding/json), [`flag` package](https://pkg.go.dev/flag), [`os` package](https://pkg.go.dev/os)
-
----
-
-## Stage 8: Just enough concurrency for servers
-
-**Why it matters for CRUD:** `net/http` handles **each request in its own goroutine**. The moment two requests touch your in-memory `RecipeBook`, you have concurrent map writes, which is a data race and can crash the program. You also need `context.Context` so that a cancelled request stops its database query.
-
-Advanced concurrency patterns are **not** a prerequisite for a CRUD app. Learn this stage well and leave pipelines and worker pools for later.
-
-### Concepts
-
-- **Goroutines:** `go f()` starts a function concurrently. They're cheap, so thousands are normal. A program exits when `main` returns, even if goroutines are still running.
-- **Data races:** Two goroutines access the same memory and at least one writes. The result is undefined behavior: wrong data, or a `fatal error: concurrent map writes`.
-- **`sync.Mutex`:** `mu.Lock()` followed by `defer mu.Unlock()`. Keep the critical section short, protect whole invariants (such as `nextID` and the map together), and **never copy a struct containing a mutex** (`go vet` reports this). `sync.RWMutex` allows many readers or one writer.
-- **The race detector:** `go test -race ./...` instruments the code and reports races it actually observes. Run it regularly.
-- **`sync.WaitGroup`:** Waits for a group of goroutines to finish. `wg.Go(func() { ... })`, available since Go 1.25, combines `Add`, `go`, and `Done`.
-- **Channels:** Typed pipes between goroutines. Learn enough to read code: unbuffered channels hand off one value at a time, buffered channels have capacity, `close` ends a channel, `range ch` drains it, and `select` waits on several channels at once. "Share memory by communicating" is the slogan, but a mutex is the right tool for protecting a map.
-- **`context.Context`:**
-  - It carries cancellation, deadlines, and a few request-scoped values.
-  - By convention it's the first parameter, `ctx context.Context`, and it's never stored in a struct.
-  - In a server, it starts at `r.Context()` and flows into every database call.
-  - `context.WithTimeout(ctx, 2*time.Second)` returns a `cancel` function. Always `defer cancel()`.
-- **Goroutine leaks:** A goroutine blocked forever on a channel nobody will use. Every goroutine you start needs a way to finish.
-
-### Coming from
-
-- **JavaScript:** There's no `async`/`await` coloring. Blocking calls are normal because the runtime schedules goroutines. `context` cancellation is similar to `AbortController`.
-- **Python:** There's no GIL. Goroutines really do run in parallel across CPU cores, which is exactly why races matter.
-- **C++:** It's like `std::thread` with `std::mutex`, but far cheaper, and with a race detector built in.
-
-### Example
-
-These use different types than your exercises:
-
-```go
-type visitCounter struct {
-	mu    sync.Mutex
-	count int
-}
-
-func (c *visitCounter) Inc() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.count++
-}
-
-func waitForOven(ctx context.Context, d time.Duration) error {
-	select {
-	case <-time.After(d):
-		return nil
-	case <-ctx.Done():
-		return ctx.Err() // context.Canceled or context.DeadlineExceeded
-	}
-}
-```
-
-### Exercises
-
-1. **You:** Write a test that calls `RecipeBook.Add` from 100 goroutines using a `WaitGroup`, then checks that `List` returns 100 recipes. Run it with and without `-race`, and read the race report carefully.
-2. **You:** Add a mutex to `RecipeBook` and make every method safe. Run the test with `-race` until it's clean. Which fields does the mutex protect, and why both of them?
-3. **You:** Predict, then run: send on an unbuffered channel with no receiver. Read the `all goroutines are asleep` error.
-4. **You:** Test `waitForOven` with a context that times out before the oven finishes and with one that doesn't. What error do you get in each case?
-5. **Discuss:** A user closes the browser tab during a slow database query. With and without context propagation, what happens to the query?
-
-### Checkpoint
-
-- Why does an in-memory store in an HTTP server need a mutex?
-- What does the race detector catch, and what can it miss?
-- Why is `ctx` the first parameter and not a struct field?
-- What happens if you forget `defer cancel()`?
-
-**References:** [Effective Go: Concurrency](https://go.dev/doc/effective_go#concurrency), [Data race detector](https://go.dev/doc/articles/race_detector), [Go concurrency patterns: Context](https://go.dev/blog/context), [`sync` package](https://pkg.go.dev/sync)
-
----
-
-# Part III: Building the service
-
-## Stage 9: HTTP with net/http
-
-**Why it matters for CRUD:** This is the "C, R, U, D over HTTP" part. You'll build the full API against your in-memory `RecipeBook` first, so you can learn HTTP without database complexity. In Stage 12 you'll replace only the storage.
-
-### Concepts
-
-- **HTTP refresher:** A request has a method, path, query, headers, and body. A response has a status, headers, and body. Watch them with `curl -i` or `curl -v`.
-- **`http.Handler`:** An interface with a single method, `ServeHTTP(w http.ResponseWriter, r *http.Request)`. `http.HandlerFunc` adapts an ordinary function into a handler. Everything in `net/http` is built from this one interface.
-- **`http.ServeMux` routing:** Patterns combine a method and a path, such as `"GET /api/recipes/{id}"`. Read path parameters with `r.PathValue("id")`. A wrong method automatically gets `405 Method Not Allowed`, and more specific patterns win over general ones. No router library is needed.
-- **Order of a response:** Set headers with `w.Header().Set(...)`, then call `w.WriteHeader(status)`, then write the body. Headers set after `WriteHeader` are ignored. Writing a body without calling `WriteHeader` sends 200.
-- **After writing an error response, `return`.** Forgetting to is a classic bug.
-- **Reading JSON safely:**
-  - Limit the body with `http.MaxBytesReader`.
-  - Call `DisallowUnknownFields` before decoding.
-  - Reject trailing data after the first JSON value.
-  - Map decoding failures to 400, or 413 for bodies that are too large.
-- **Writing JSON:** Use one small helper that sets `Content-Type`, writes the status, and encodes the value. Return `[]`, never `null`, for empty lists.
-- **Status codes for CRUD:**
+- **Startup:** `WebApplication.CreateBuilder` sets up configuration, logging, dependency injection, and Kestrel. `builder.Build()` freezes the services, and `app.Run()` starts the host. Look at `launchSettings.json` for the ports and environment.
+- **Routing:** Attribute routing (`[Route("api/recipes")]`, `[HttpGet("{id:long}")]`). What does a route constraint do when the value doesn't match: a 404 or a 400?
+- **Controllers and minimal APIs:** `ControllerBase` with `[ApiController]`, compared with `app.MapGet(...)`. Minimal APIs are closer to Go's mux.
+- **What `[ApiController]` adds:**
+  - It infers where each parameter comes from, so complex types bind from the body.
+  - It returns a 400 `ValidationProblemDetails` automatically when `ModelState` is invalid.
+  - It turns client error results into `ProblemDetails` bodies.
+  - With nullable reference types enabled, **non-nullable properties are implicitly `[Required]`**.
+- **Model binding and JSON:** `System.Text.Json` uses camelCase in web defaults. Unknown fields are ignored unless configured otherwise. What happens when a field is missing, null, or the wrong type?
+- **Results:** Use `ActionResult<T>`, `Ok`, `NotFound`, `CreatedAtAction` (which sets the `Location` header), `NoContent`, and `Conflict`. Learn the status codes you'll use for CRUD:
 
   | Operation | Route | Success | Common failures |
   | --- | --- | --- | --- |
-  | Create | `POST /api/recipes` | `201 Created` with a `Location` header and the created body | 400 malformed JSON; 422 or 400 validation failure |
+  | Create | `POST /api/recipes` | `201 Created` with `Location` and the created body | 400 validation failure |
   | List | `GET /api/recipes` | `200 OK` with an array | 400 bad query parameters |
-  | Read | `GET /api/recipes/{id}` | `200 OK` | 400 bad ID; 404 |
-  | Replace | `PUT /api/recipes/{id}` | `200 OK` with the updated body | 400, 404, 422; 409 conflict (Stage 13) |
-  | Delete | `DELETE /api/recipes/{id}` | `204 No Content` | 404, or 204 if you make it idempotent; choose and document |
-  | Health | `GET /api/health` | `200 OK` | 503 when a dependency is down (Stage 12) |
+  | Read | `GET /api/recipes/{id}` | `200 OK` | 404 |
+  | Replace | `PUT /api/recipes/{id}` | `200 OK` | 400, 404, 409 (N6) |
+  | Delete | `DELETE /api/recipes/{id}` | `204 No Content` | 404, or 204 if idempotent; choose and document |
 
-  Choose one convention for validation failures (400 or 422) and document it.
-- **A consistent error shape:** For example `{"error": {"message": "...", "fields": {"title": "required"}}}`. [RFC 9457 problem details](https://www.rfc-editor.org/rfc/rfc9457) is a standard alternative. **Never send raw internal errors to clients.** Log them and return a generic 500 message.
-- **Dependencies through a struct:** An `application` struct holds the store and logger, and handlers are its methods. No globals and no `http.DefaultServeMux`.
-- **`net/http/httptest`:** `httptest.NewRequest` plus `httptest.NewRecorder` tests a handler without a network. Send requests **through the mux** so that `PathValue` is populated.
+- **Request and response DTOs:** Keep the API's shapes separate from internal types and database rows.
+- **Concurrency:** Kestrel serves requests concurrently on the thread pool. A singleton in-memory store therefore needs `lock` or `ConcurrentDictionary`. This is the same race you'll meet in Go in G8.
+- **Cancellation:** Adding a `CancellationToken` parameter to an action binds it to `HttpContext.RequestAborted` automatically.
+- **OpenAPI and trying requests:** The template's OpenAPI document, `.http` files in the editor, or `curl -i`.
 
 ### Example
 
-```go
-type application struct {
-	logger  *slog.Logger
-	recipes *RecipeBook
+This uses a different resource than your exercise:
+
+```csharp
+public sealed class CreateSpeakerRequest
+{
+    [Required, StringLength(100)]
+    public string Name { get; init; } = "";
 }
 
-func (app *application) routes() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /api/health", app.health)
-	mux.HandleFunc("GET /api/recipes", app.listRecipes)
-	mux.HandleFunc("POST /api/recipes", app.createRecipe)
-	mux.HandleFunc("GET /api/recipes/{id}", app.getRecipe)
-	mux.HandleFunc("PUT /api/recipes/{id}", app.updateRecipe)
-	mux.HandleFunc("DELETE /api/recipes/{id}", app.deleteRecipe)
-	return mux
-}
+[ApiController]
+[Route("api/speakers")]
+public sealed class SpeakersController(SpeakerBook book) : ControllerBase
+{
+    [HttpGet("{id:long}")]
+    public ActionResult<Speaker> Get(long id) =>
+        book.Find(id) is { } speaker ? speaker : NotFound();
 
-func writeJSON(w http.ResponseWriter, status int, v any) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(v)
-}
-
-func (app *application) health(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
-}
-```
-
-A handler test:
-
-```go
-func TestGetRecipeNotFound(t *testing.T) {
-	app := &application{
-		logger:  slog.New(slog.DiscardHandler),
-		recipes: NewRecipeBook(),
-	}
-	req := httptest.NewRequest(http.MethodGet, "/api/recipes/999", nil)
-	rec := httptest.NewRecorder()
-
-	app.routes().ServeHTTP(rec, req)
-
-	if rec.Code != http.StatusNotFound {
-		t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)
-	}
+    [HttpPost]
+    public ActionResult<Speaker> Create(CreateSpeakerRequest request)
+    {
+        var speaker = book.Add(request.Name);
+        return CreatedAtAction(nameof(Get), new { id = speaker.Id }, speaker);
+    }
 }
 ```
 
 ### Exercises
 
-1. **You:** Start a server with only `/api/health` and inspect it with `curl -i`. Try `POST /api/health` and explain the 405 response.
-2. **You:** Implement `GET /api/recipes` and `GET /api/recipes/{id}` on top of `RecipeBook`. Handle an invalid ID, a missing recipe, and an empty list (which must return `[]`). Write handler tests for each.
-3. **You:** Write a `decodeJSON` helper with a size limit, unknown-field rejection, and trailing-data rejection. Test it with malformed JSON, an unknown field, and an oversized body.
-4. **You:** Implement `POST /api/recipes`. Decode a request struct, validate it with your Stage 5 validator, convert it to `Recipe`, store it, and respond 201 with a `Location` header. Test valid input, invalid input, and malformed JSON.
-5. **You:** Implement `PUT` and `DELETE`. Update your endpoint table if you changed any decisions.
-6. **You:** Write one `writeError` helper and make every failure use the same error shape. Add one test that asserts the JSON error body, not just the status.
-7. **Experiment:** Remove a `return` after an error response. Run the request and read the server log's `superfluous response.WriteHeader call`. Restore it.
+1. **You:** Build an in-memory `RecipeBook` registered as a singleton, and implement full CRUD for recipes with request and response DTOs. Make it thread-safe and explain which data the lock protects.
+2. **You:** For each experiment, write down what you *expect* first, then try it with `curl -i` and record what the framework did:
+   - Send malformed JSON.
+   - Leave out a required field.
+   - Send an unknown field.
+   - Send `"title": null`.
+   - Use a non-numeric ID.
+   - Send a 50 MB body.
+
+   **Keep these notes.** G9 asks you to reproduce or deliberately change each behavior by hand.
+3. **You:** Rewrite one endpoint as a minimal API. What did the controller give you that the minimal version doesn't?
+4. **You:** Write tests for `RecipeBook` with `[Theory]`, then write a test that calls `Add` from 100 tasks with `Parallel.ForEachAsync` and checks the count. Remove the lock and watch the test. Is the failure reliable? Compare that with Go's race detector later.
+5. **You:** Add a `CancellationToken` to a deliberately slow endpoint, using `Task.Delay(5000, ct)`. Cancel `curl` midway and look at what gets logged.
+6. **Vue:** Do V2 against this API.
 
 ### Checkpoint
 
-- What is `http.Handler`, and why can middleware and muxes be handlers too?
-- Why route test requests through the mux instead of calling the handler directly?
-- Without notes: list the status code for each CRUD operation's success and two of its failures.
-- Why should a 500 response never contain `err.Error()`?
+- List four things `[ApiController]` does that you'd otherwise have to write.
+- Why does a singleton store need a lock in ASP.NET Core?
+- Where does an action's `CancellationToken` come from?
+- Without notes: give the success status and two failure statuses for each CRUD operation.
 
-**References:** [`net/http` package](https://pkg.go.dev/net/http), [Routing enhancements for Go 1.22](https://go.dev/blog/routing-enhancements), [`httptest` package](https://pkg.go.dev/net/http/httptest), [MDN: HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
-
----
-
-## Stage 10: Structuring and running the service
-
-**Why it matters for CRUD:** A well-made service is configurable, observable, and stops cleanly. It also has a `main` you can read top to bottom. That's the difference between "it runs on my laptop" and something you can deploy.
-
-### Concepts
-
-- **`main` as the composition root:**
-  1. Load configuration.
-  2. Build the logger.
-  3. Open dependencies.
-  4. Build the `application`.
-  5. Start the server.
-  6. Wait for a shutdown signal.
-  7. Shut down.
-
-  A common pattern is to keep `main` tiny: it calls `run(ctx, getenv) error` and exits with code 1 on error, which makes `run` testable.
-- **Configuration from environment variables:** Use `PORT`, `DATABASE_URL`, `LOG_LEVEL`, and so on. Validate them at startup and **fail fast** with a clear message. Provide sensible local defaults where that's safe. Never put secrets in code or logs.
-- **Binding:** Many hosts, including Render, set `PORT` and expect you to listen on `0.0.0.0:$PORT`. The address `":" + port` listens on all interfaces. Locally, `localhost:8080` is fine.
-- **`http.Server` with timeouts:** The bare `http.ListenAndServe` has **no timeouts**, so slow clients can hold connections forever. Set `ReadHeaderTimeout`, `ReadTimeout`, `WriteTimeout`, and `IdleTimeout`.
-- **Graceful shutdown:** `signal.NotifyContext` gives you a context that's cancelled on Ctrl-C or `SIGTERM`. `srv.Shutdown(ctx)` stops accepting new connections and lets in-flight requests finish.
-- **Structured logging with `log/slog`:** Logs are key-value pairs, such as `logger.Info("recipe created", "id", id)`. Use the text handler locally and the JSON handler in production. Use levels, and pass the logger in instead of using a global.
-- **Middleware:** A function of the form `func(next http.Handler) http.Handler`, which is closures from Stage 2 applied to HTTP. Common uses are request logging (method, path, status, duration), panic recovery that returns a JSON 500, and request IDs. Chain them by plain function wrapping, no framework needed.
-- **Capturing the status code:** Wrap `http.ResponseWriter` by embedding it, which is the Stage 4 concept, and override `WriteHeader`.
-- **CORS and the Vue dev server:** In development, a Vite proxy avoids CORS entirely. If the frontend and API are on different origins in production, configure CORS deliberately with explicit origins, not `*` with credentials.
-- **Layout:**
-  - Start **flat**: `main.go`, `routes.go`, `handlers.go`, `store.go`, `errors.go`, and `middleware.go` in a single `main` package.
-  - Move to `cmd/api/` and `internal/...` when the flat layout causes friction, not before.
-  - Document the run commands in the README.
-
-### Example
-
-```go
-type statusRecorder struct {
-	http.ResponseWriter // embedded: all methods promoted
-	status int
-}
-
-func (r *statusRecorder) WriteHeader(code int) {
-	r.status = code
-	r.ResponseWriter.WriteHeader(code)
-}
-```
-
-Shutdown sketch:
-
-```go
-srv := &http.Server{
-	Addr:              cfg.addr,
-	Handler:           app.routes(),
-	ReadHeaderTimeout: 5 * time.Second,
-	ReadTimeout:       15 * time.Second,
-	WriteTimeout:      15 * time.Second,
-	IdleTimeout:       60 * time.Second,
-}
-
-serverErr := make(chan error, 1)
-go func() { serverErr <- srv.ListenAndServe() }()
-
-select {
-case err := <-serverErr:
-	return err // for example, the port is already in use
-case <-ctx.Done(): // Ctrl-C or SIGTERM
-}
-
-shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-defer cancel()
-return srv.Shutdown(shutdownCtx)
-```
-
-### Exercises
-
-1. **You:** Write `loadConfig(getenv func(string) string) (config, error)`. Test the defaults, a valid override, and an invalid `PORT`, passing a fake `getenv` instead of setting real environment variables. Then compare that with `t.Setenv`.
-2. **You:** Add an `slog.Logger` to `application` and log one line per created recipe. Switch between the text and JSON handlers with configuration.
-3. **You:** Write logging middleware using `statusRecorder`. What should `status` start as, and why? Test it with `httptest`.
-4. **You:** Add recovery middleware. Make a handler panic deliberately and compare the behavior with and without it.
-5. **You:** Implement graceful shutdown. Add a temporary endpoint that sleeps 5 seconds, call it, press Ctrl-C right away, and confirm the request still completes.
-6. **You:** Write the README "Run locally" section for `learning/recipebox/`. Ask someone, or a fresh agent session, to follow it exactly.
-
-### Checkpoint
-
-- Walk through `main` and say what each step is for.
-- Why are server timeouts important for a public service?
-- How does middleware use closures and the `http.Handler` interface?
-- What happens to in-flight requests on `SIGTERM` with and without `Shutdown`?
-
-**References:** [Structured logging with slog](https://go.dev/blog/slog), [`log/slog` package](https://pkg.go.dev/log/slog), [`http.Server`](https://pkg.go.dev/net/http#Server), [`os/signal` package](https://pkg.go.dev/os/signal)
+**References:** [Create web APIs with ASP.NET Core](https://learn.microsoft.com/aspnet/core/web-api/), [Routing](https://learn.microsoft.com/aspnet/core/fundamentals/routing), [Model binding](https://learn.microsoft.com/aspnet/core/mvc/models/model-binding), [Model validation](https://learn.microsoft.com/aspnet/core/mvc/models/validation), [OpenAPI overview](https://learn.microsoft.com/aspnet/core/fundamentals/openapi/overview)
 
 ---
 
-## Stage 11: PostgreSQL for application developers
+## N3: PostgreSQL for application developers
 
-**Why it matters for CRUD:** The database is the source of truth. Constraints are the last line of defense when application validation has a bug, and migrations make the schema reproducible for you, your tests, and production.
-
-You already know SQL. This stage covers what's specific to PostgreSQL and what matters for applications.
+**Why it matters:** Both backends use PostgreSQL, so you learn it once, here, in the time-rich track. The database is the source of truth. Constraints are the last line of defense, and migrations make the schema reproducible.
 
 ### Concepts
 
-- **Running PostgreSQL locally:** The options are a Docker `postgres` image, Postgres.app, or Homebrew. The project hasn't chosen yet (see [ARCHITECTURE](../docs/ARCHITECTURE.md)). Pick one, document the setup commands, and record an ADR if the choice has lasting consequences. Keep separate **development** and **test** databases.
+- **Running it locally with Docker:**
+
+  ```sh
+  docker run --name recipebox-db -e POSTGRES_PASSWORD=devpassword -p 5432:5432 -d postgres:18
+  docker exec -it recipebox-db psql -U postgres
+  ```
+
+  Add a named volume if you want the data to survive removing the container; check the image documentation for the mount path. Keep separate **development** and **test** databases. How Ma's Cooking runs PostgreSQL locally is still undecided ([ARCHITECTURE](../docs/ARCHITECTURE.md)).
 - **`psql`:** `\l` lists databases, `\c db` connects to one, `\dt` lists tables, `\d recipes` describes a table, `\x` toggles expanded output, and `\q` quits.
-- **Connection URLs:** `postgres://user:password@localhost:5432/recipebox_dev?sslmode=disable`. Keep them in environment variables, never in code.
-- **Types worth knowing:**
-  - `text`: no need for `varchar(n)`. Express length rules with `CHECK`.
-  - `bigint GENERATED ALWAYS AS IDENTITY`: the modern auto-increment.
-  - `uuid`: an alternative ID with different tradeoffs.
-  - `timestamptz`: always use this for points in time.
-  - `boolean`, `integer`, and `numeric` for exact decimals.
-  - `jsonb`: useful, but not an escape hatch from designing a schema.
+- **Coming from SQL Server:**
+
+  | SQL Server | PostgreSQL |
+  | --- | --- |
+  | `IDENTITY(1,1)` | `bigint GENERATED ALWAYS AS IDENTITY` |
+  | `nvarchar(n)` | `text`, with length rules in a `CHECK`; it's always Unicode |
+  | `datetime2` and `datetimeoffset` | `timestamptz`, which stores a UTC instant. Use it for every point in time. |
+  | `bit` | `boolean` |
+  | `TOP n` | `LIMIT n` |
+  | `OUTPUT INSERTED.*` | `RETURNING *` |
+  | `MERGE` for upserts | `INSERT ... ON CONFLICT` |
+  | `@param` | `$1` on the wire. Npgsql and NPoco translate for you, and Go uses `$1` directly. |
+  | `[Brackets]` and case-insensitive collation | Unquoted names fold to lowercase, so use `snake_case`. Text comparison is case-sensitive by default. |
+
 - **Constraints:**
-  - `NOT NULL`, `CHECK`, `UNIQUE`, `PRIMARY KEY`, and `REFERENCES` (foreign keys) with `ON DELETE RESTRICT`, `CASCADE`, or `SET NULL`.
+  - `NOT NULL`, `CHECK`, `UNIQUE`, `PRIMARY KEY`, and `REFERENCES` with `ON DELETE RESTRICT`, `CASCADE`, or `SET NULL`.
   - `DEFAULT` values.
   - Choose `ON DELETE` behavior by asking what *should* happen to the product data.
-- **NULL semantics:** `NULL = NULL` is not true, so use `IS NULL`. Prefer `NOT NULL` with a meaningful default when "missing" doesn't mean anything different from "empty".
-- **Useful PostgreSQL features:** `RETURNING` (insert and get the ID and timestamps back in one round trip), `ON CONFLICT` (upsert), and `$1, $2` placeholders.
-- **Unquoted identifiers are folded to lowercase.** Use `snake_case` and you'll never need quotes.
-- **Transactions:** `BEGIN`, `COMMIT`, and `ROLLBACK`. The default isolation level is Read Committed. Know that the lost-update problem exists (Stage 13).
-- **Indexes:** Primary keys and `UNIQUE` constraints are indexed automatically. **Foreign key columns are not.** Add indexes when a query pattern justifies them, and check with `EXPLAIN ANALYZE`.
+- **NULL semantics:** Use `IS NULL`. Prefer `NOT NULL` with a meaningful default.
+- **Transactions:** The default isolation level is Read Committed. Know that the lost-update problem exists (N6).
+- **Indexes:** Primary keys and `UNIQUE` constraints are indexed automatically. **Foreign key columns are not.** Check with `EXPLAIN ANALYZE`.
 - **Migrations:**
   - Numbered SQL files applied in order and recorded in a tracking table.
-  - **Never edit a migration that has already been applied anywhere.** Add a new one instead.
-  - First apply plain SQL files with `psql -f` so you understand the mechanics.
-  - Then choose a tool only for a concrete need: [golang-migrate](https://github.com/golang-migrate/migrate), [goose](https://github.com/pressly/goose), or [tern](https://github.com/jackc/tern).
-
-### Coming from
-
-- **MySQL or SQLite:** PostgreSQL is stricter about types, uses `$1` instead of `?`, has identity columns instead of `AUTO_INCREMENT`, and has real `timestamptz`.
-- **SQL in general:** Treat constraints as part of your application's correctness, not as administration.
+  - **Never edit a migration that has already been applied anywhere.** Add a new one.
+  - NPoco has no migrations of its own. Start with plain SQL files applied through `psql`, then consider a runner such as [DbUp](https://dbup.readthedocs.io/).
+  - Plain SQL files also keep the schema portable to the Go side.
 
 ### Practice schema
 
-This is practice only, not a decision about the product schema:
+This is practice only, not a decision about the Ma's Cooking schema:
 
 ```sql
 CREATE TABLE speakers (
@@ -1092,82 +465,985 @@ CREATE INDEX recipes_speaker_id_idx ON recipes (speaker_id);
 
 ### Exercises
 
-1. **You:** Install or start PostgreSQL, then create `recipebox_dev` and `recipebox_test`. Write the exact commands in the README.
-2. **You:** Put the schema in `migrations/0001_init.sql`, apply it with `psql -f`, and inspect it with `\d recipes`.
-3. **You:** Try to insert rows that break each constraint: an empty title, a missing speaker, an unknown `speaker_id`, and deleting a speaker who still has recipes. Note each error's SQLSTATE code. You'll map them in Go.
-4. **You:** Write `INSERT ... RETURNING id, created_at`, a list query ordered by `created_at DESC, id DESC` with `LIMIT 20`, and a join that returns the speaker's name with each recipe.
-5. **You:** In `psql`, run `BEGIN`, insert a row, then `ROLLBACK`. Confirm the row is gone. Repeat with two `psql` sessions and observe what each one can see before the commit.
-6. **Discuss:** Should deleting a recipe cascade to its media later on? What does [PRODUCT](../docs/PRODUCT.md) say deletion has to mean for privacy?
-7. **You:** Run `EXPLAIN ANALYZE` on the list query and the join. Find where the index on `speaker_id` gets used, or doesn't, and why.
+1. **You:** Start the container and create `recipebox_dev` and `recipebox_test`. Document the exact commands in `learning/dotnet/README.md`.
+2. **You:** Save the schema as `learning/dotnet/migrations/0001_init.sql`, apply it, and inspect it with `\d recipes`.
+3. **You:** Insert rows that break each constraint: an empty title, an unknown `speaker_id`, and deleting a speaker who still has recipes. Record each error's SQLSTATE code; you'll map them in both C# and Go.
+4. **You:** Write `INSERT ... RETURNING`, a list query ordered by `created_at DESC, id DESC` with `LIMIT 20`, and a join that includes the speaker's name.
+5. **You:** In two `psql` sessions, `BEGIN` and update the same recipe in both. Watch the second session wait. Then commit the first and explain what the second sees.
+6. **Discuss:** Should deleting a recipe cascade to its future media? What does [PRODUCT](../docs/PRODUCT.md) say deletion has to mean?
 
 ### Checkpoint
 
-- Why use database constraints if Go already validates?
-- Why `timestamptz` instead of `timestamp`?
-- What must you never do to an applied migration, and why?
+- Why use constraints if the API already validates?
+- Name three PostgreSQL habits that differ from SQL Server.
+- What must you never do to an applied migration?
 - Which columns get indexes automatically, and which commonly need one added?
 
 **References:** [PostgreSQL tutorial](https://www.postgresql.org/docs/current/tutorial.html), [Constraints](https://www.postgresql.org/docs/current/ddl-constraints.html), [Data types](https://www.postgresql.org/docs/current/datatype.html), [Error codes](https://www.postgresql.org/docs/current/errcodes-appendix.html), [Using EXPLAIN](https://www.postgresql.org/docs/current/using-explain.html)
 
 ---
 
-## Stage 12: Go and PostgreSQL together
+## N4: Data access with Npgsql and NPoco
 
-**Why it matters for CRUD:** This is where data persists. Getting it right means visible, parameterized SQL, errors mapped cleanly across layers, contexts on every query, and tests that run against a real database.
+**Why it matters:** NPoco is what your team uses at work. Understanding exactly what SQL it generates, how it maps rows, and how it manages connections and transactions makes you better at work. It also sets up G11, where you do all of it by hand.
 
 ### Concepts
 
-- **Choosing a driver:**
-  - `database/sql` is Go's generic database interface, similar to Python's DB-API.
-  - [`pgx`](https://pkg.go.dev/github.com/jackc/pgx/v5) is a PostgreSQL-specific driver with better type support and its own pool, `pgxpool`. The project leans toward `pgx` (see [ARCHITECTURE](../docs/ARCHITECTURE.md)).
-  - This is likely your first dependency: `go get github.com/jackc/pgx/v5`. Look at what changes in `go.mod` and `go.sum`.
-- **The pool:**
-  - Create one `pgxpool.Pool` at startup, share it everywhere (it's safe for concurrent use), and close it on shutdown.
-  - `Ping` it at startup with a timeout so a bad configuration fails fast.
-- **Three query shapes:**
-  - `QueryRow(...).Scan(&a, &b)` for exactly one row. `pgx.ErrNoRows` means none was found.
-  - `Query(...)` followed by `for rows.Next() { rows.Scan(...) }`, then `rows.Err()`, with `defer rows.Close()`.
-  - `Exec(...)` for writes without returned rows. Check `RowsAffected()` for updates and deletes.
-- **Parameters, always:** Write `WHERE id = $1` and pass `id` as an argument. **Never build SQL with `fmt.Sprintf` or `+`**, because that's SQL injection. Identifiers such as column names in `ORDER BY` can't be parameters, so map user input through an allowlist instead.
-- **Map errors at the storage boundary:**
+- **The layers:**
+  - **Npgsql** is the ADO.NET provider. It owns connections, the wire protocol, type conversion, and **connection pooling**, which is on by default and keyed by connection string.
+  - **NPoco** sits on top. It maps rows to objects, generates CRUD SQL, and manages transactions.
+- **Creating the database object:** `new Database(connectionString, DatabaseType.PostgreSQL, NpgsqlFactory.Instance)`. A `Database` holds a connection and transaction state, so **register it as scoped**, one per request. Never register it as a singleton.
+- **Mapping:**
+  - `[TableName]`, `[PrimaryKey]` (auto-increment by default), `[Column]`, `[Ignore]`, `[ResultColumn]`, and `[ComputedColumn]`. The last two are read but never written.
+  - Column names match property names case-insensitively, but **underscores don't match**, so `created_at` needs `[Column("created_at")]` or a fluent convention.
+- **Querying:**
+  - `Fetch<T>`, `SingleOrDefaultById<T>`, `SingleOrDefault<T>`, and `Page<T>` or `SkipTake<T>`.
+  - The async versions (`FetchAsync`, `SingleOrDefaultByIdAsync`, and others) accept a `CancellationToken`.
+  - Parameters are positional: `"WHERE speaker_id = @0"`. **Never concatenate input into SQL.**
+- **Writing:** `Insert` fills in the generated ID, `Update` writes every mapped column, and `Delete` removes the row. Calling `Update` with a column list writes only those columns.
+- **Seeing the SQL:** `LastSQL`, `LastArgs`, and `LastCommand` live on the concrete `Database` class, not on `IDatabase`. For logging, subclass `Database` and override `OnExecutingCommand`. **Look at the generated SQL for every operation at least once.**
+- **Transactions:** `using var tx = db.GetTransaction(); ... tx.Complete();`. Disposing without `Complete()` rolls back. Async versions exist too.
+- **Errors:** `PostgresException` exposes `SqlState`. Compare it with constants such as `PostgresErrorCodes.UniqueViolation` (`23505`) and `ForeignKeyViolation` (`23503`). Map them to domain results in the data layer, not in controllers.
+- **Dates and times:** Npgsql maps `timestamptz` to `DateTime` with `Kind = Utc`, and **rejects writing a non-UTC `DateTime`** to it. Let the database default `created_at` and `updated_at`, or use UTC everywhere.
+- **Where SQL lives:** Keep it visible in a small store or repository class per aggregate, not scattered through controllers.
 
-  | Storage result | Store returns | Handler responds |
-  | --- | --- | --- |
-  | `pgx.ErrNoRows`, or 0 rows affected | `ErrNotFound` | 404 |
-  | `23505` unique violation | `ErrConflict`, or a specific error | 409 |
-  | `23503` foreign key violation | An error such as `ErrSpeakerNotFound` or `ErrInUse` | 422 or 409 |
-  | `23514` check violation | A validation-style error, which means a bug in Go validation | 422 |
-  | Anything else | A wrapped error with context | 500 (logged, generic message) |
+### Example
 
-  Extract the code with `var pgErr *pgconn.PgError; errors.As(err, &pgErr)`. **The store knows SQL and the handler knows HTTP. Neither leaks into the other.**
-- **NULL and Go:** Columns that are `NOT NULL` map directly to Go types. Nullable columns need pointers (`*string`) or `pgtype` types. This is one more reason to prefer `NOT NULL`.
-- **Time:** `timestamptz` maps to `time.Time`. Store and compare in UTC, and format for display at the edges.
-- **Transactions:** Begin, then `defer tx.Rollback(ctx)`, then do the work, then `tx.Commit(ctx)`. The deferred rollback is harmless after a commit and saves you on every early return.
-- **Contexts on every call:** Pass the request context down. Add a timeout for anything that could hang.
-- **Integration tests against a real database:** Mocking SQL proves very little.
-  - Read `TEST_DATABASE_URL` and call `t.Skip` if it isn't set. Never point tests at the dev database.
-  - Apply migrations, and reset the tables between tests, for example with `TRUNCATE ... RESTART IDENTITY CASCADE`.
-  - Packages run their tests **in parallel**. If several packages touch the same database, use `go test -p 1` or a database per package.
-- **Later:** [`sqlc`](https://sqlc.dev/) generates type-safe Go from SQL you write. Consider it once repetitive scanning becomes painful, not before. Avoid heavy ORMs.
+This uses speakers rather than your exercise's recipes:
+
+```csharp
+[TableName("speakers")]
+[PrimaryKey("id")]
+public sealed class SpeakerRow
+{
+    [Column("id")] public long Id { get; set; }
+    [Column("name")] public string Name { get; set; } = "";
+    [ComputedColumn("created_at")] public DateTime CreatedAt { get; set; }
+}
+
+public sealed class SpeakerStore(IDatabase db)
+{
+    public Task<SpeakerRow?> FindAsync(long id, CancellationToken ct) =>
+        db.SingleOrDefaultByIdAsync<SpeakerRow>(id, ct);
+
+    public Task<List<SpeakerRow>> ListAsync(CancellationToken ct) =>
+        db.FetchAsync<SpeakerRow>(new Sql("SELECT id, name, created_at FROM speakers ORDER BY name, id"), ct);
+}
+```
+
+### Exercises
+
+1. **You:** Register `IDatabase` as scoped and replace the in-memory `RecipeBook` with a `RecipeStore` built on NPoco. Keep the controllers unchanged if you can. Did you need an interface to do that?
+2. **You:** Add SQL logging by overriding `OnExecutingCommand`. For `Insert`, `Update`, `Delete`, `SingleOrDefaultById`, and `Page`, paste the generated SQL into your notes. What does `Update` write when you change only the title?
+3. **You:** Map `23503` (unknown speaker) and `23505` to domain results, and return 422 or 409 from the API. Write integration tests for both.
+4. **You:** Build a `recipe_revisions` table (migration `0002`) and make updating a recipe transactional: copy the old row into revisions, then update. Force an exception between the two steps and prove that nothing was written. This preserves the original content when people edit ([ADR 0002](../docs/decisions/0002-preserve-original-content.md)).
+5. **Experiment:** Register `IDatabase` as a singleton, run two concurrent requests that use transactions, and observe what goes wrong. Explain it in terms of shared connection state, then revert.
+6. **Experiment:** Try to insert `DateTime.Now` into a `timestamptz` column through a mapped property. Read Npgsql's error and fix it properly.
+
+### Checkpoint
+
+- Which part is Npgsql's job and which is NPoco's?
+- Why must `IDatabase` be scoped?
+- What SQL does `db.Update(row)` send, and when is a column list better?
+- Where does connection pooling happen, and how could you see it?
+
+**References:** [NPoco wiki](https://github.com/schotime/NPoco/wiki), [Npgsql documentation](https://www.npgsql.org/doc/), [Npgsql date and time handling](https://www.npgsql.org/doc/types/datetime.html), [Npgsql connection string parameters](https://www.npgsql.org/doc/connection-string-parameters.html)
+
+---
+
+## N5: The framework's machinery
+
+**Why it matters:** Dependency injection, configuration, logging, middleware, and hosting are where ASP.NET Core does the most for you without you noticing. Learn how each piece actually works, because G10 has you rebuild all of it in about a hundred lines of Go.
+
+### Concepts
+
+- **Dependency injection:**
+  - **Lifetimes:** singleton (one for the app), scoped (one per request), and transient (a new one every time).
+  - **Captive dependencies:** a singleton that holds onto a scoped service, which then lives far too long. `ValidateScopes` catches this in Development.
+  - **Disposal:** the container disposes the services it created.
+  - Constructor injection and primary constructors.
+  - The container is just a dictionary from type to factory with lifetime rules. Keep that mental model in mind for G10.
+- **Configuration:**
+  - Layered sources: `appsettings.json`, `appsettings.{Environment}.json`, user secrets, environment variables, and the command line, with later sources winning.
+  - `ConnectionStrings__Default` as an environment variable maps to `ConnectionStrings:Default`.
+- **The options pattern:** `AddOptions<T>().Bind(...).ValidateDataAnnotations().ValidateOnStart()` makes the app fail fast when configuration is wrong.
+- **Logging:**
+  - `ILogger<T>` with **message templates**: write `"Created {RecipeId}"`, never an interpolated string. Templates keep the values as structured fields.
+  - Log levels, configured per category in `appsettings`.
+  - `BeginScope` attaches context to every log line within it.
+- **The middleware pipeline:**
+  - The order is the behavior. A typical order is exception handler, HTTPS redirection, CORS, authentication, authorization, then endpoints.
+  - Write middleware inline with `app.Use(async (context, next) => ...)` or as a class.
+  - Know the difference between middleware and filters: middleware sees every request, and filters see controller actions.
+- **Errors:** `AddProblemDetails()`, `UseExceptionHandler()`, and `IExceptionHandler` turn unhandled exceptions into a consistent 500 response. Never include exception details in production responses.
+- **Health checks:** `AddHealthChecks()` with a database check and `MapHealthChecks("/api/health")`. Return 503 when the database is down.
+- **Hosting and shutdown:**
+  - The generic host listens for `SIGTERM` and stops accepting new requests, giving in-flight ones time to finish (`HostOptions.ShutdownTimeout`).
+  - `IHostApplicationLifetime` exposes hooks for start and stop.
+  - `IHostedService` and `BackgroundService` run work alongside requests. A brief look is enough.
+- **CORS and the Vue dev server:** A Vite proxy avoids CORS in development. If origins differ in production, configure CORS with explicit origins.
+
+### Example
+
+```csharp
+app.Use(async (context, next) =>
+{
+    var start = Stopwatch.GetTimestamp();
+    await next(context);
+    app.Logger.LogInformation("{Method} {Path} responded {StatusCode} in {ElapsedMs:0.0} ms",
+        context.Request.Method, context.Request.Path, context.Response.StatusCode,
+        Stopwatch.GetElapsedTime(start).TotalMilliseconds);
+});
+```
+
+### Exercises
+
+1. **You:** Write down `Program.cs` as a numbered list of the steps the host performs before your first controller runs. Check it against the documentation.
+2. **You:** Create a deliberate captive dependency (a singleton that takes `IDatabase`) and observe the error in Development. Explain the bug it prevents.
+3. **You:** Add a `RecipeLimits` options class with `MaxPageSize` and `MaxStoryLength`, validated on start. Break the configuration and watch the app refuse to start.
+4. **You:** Add request-logging middleware like the example, plus a request ID that appears in every log line through `BeginScope`. Move the middleware before and after `UseExceptionHandler` and explain the difference.
+5. **You:** Add `IExceptionHandler` and `ProblemDetails`, throw from an endpoint, and confirm that the client sees a clean 500 while the logs contain the stack trace.
+6. **You:** Add a health check that pings PostgreSQL. Stop the container and watch the endpoint report 503.
+7. **You:** Add an endpoint that sleeps 10 seconds, call it, stop the app with Ctrl-C, and observe whether the request finishes. Change `ShutdownTimeout` and repeat.
+8. **Vue:** Do V3.
+
+### Checkpoint
+
+- Explain the three lifetimes and a captive dependency.
+- In what order do configuration sources apply, and how do you set a nested key from an environment variable?
+- Why does middleware order matter? Give one example where the wrong order breaks something.
+- What happens to in-flight requests on `SIGTERM`?
+
+**References:** [Dependency injection](https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection), [Configuration](https://learn.microsoft.com/aspnet/core/fundamentals/configuration/), [Options pattern](https://learn.microsoft.com/aspnet/core/fundamentals/configuration/options), [Logging](https://learn.microsoft.com/aspnet/core/fundamentals/logging/), [Middleware](https://learn.microsoft.com/aspnet/core/fundamentals/middleware/), [Handle errors](https://learn.microsoft.com/aspnet/core/fundamentals/error-handling), [Health checks](https://learn.microsoft.com/aspnet/core/host-and-deploy/health-checks), [Generic host](https://learn.microsoft.com/aspnet/core/fundamentals/host/generic-host)
+
+---
+
+## N6: Making CRUD well made
+
+**Why it matters:** Most CRUD code "works". Well-made CRUD code survives bad input, simultaneous edits, large lists, and malicious users, and it documents what it promises.
+
+### Concepts
+
+- **Three layers of validation:**
+  1. Binding checks the shape.
+  2. Validation checks the rules. Use data annotations, or a library such as FluentValidation if your work uses one.
+  3. Database constraints are the backstop.
+
+  Return **all** field errors at once in `ValidationProblemDetails`. `StringLength` counts UTF-16 code units. Decide whether that's acceptable for Khmer and emoji.
+- **Preserve what the user wrote:** Never silently trim or rewrite stories and transcripts ([ADR 0002](../docs/decisions/0002-preserve-original-content.md)).
+- **The API contract:** One error shape (`ProblemDetails`), a documented status for every case, camelCase JSON, and an `API.md` you keep current. JavaScript loses precision for integers above 2^53, which is fine for these IDs but worth knowing.
+- **Pagination:**
+  - NPoco's `Page<T>` is offset-based and runs a count query. Look at its SQL.
+  - **Keyset pagination**, written by hand with `WHERE (created_at, id) < (@0, @1)`, is stable and fast for infinite scroll.
+  - Always cap the page size and add a unique tiebreaker to `ORDER BY`.
+- **Sorting safely:** Allowlist the sort options in a dictionary. Column names can't be parameters.
+- **PUT versus PATCH:** `System.Text.Json` can't tell a missing property from `null` on a plain nullable property either. Compare options such as JSON Patch, a wrapper type, or a pointer-like `Optional<T>`. This is the same problem Go solves with pointers (G7).
+- **Lost updates:**
+  - The problem: two people load version 3 and both save, and the second save silently erases the first.
+  - With NPoco, `[VersionColumn("version", VersionColumnType.Number)]` makes `Update` check and increment the version, throwing `DBConcurrencyException` on a mismatch. Map that to 409.
+  - Know what SQL it generates. G12 writes it by hand.
+- **Cancellation and timeouts:** Pass the `CancellationToken` into every NPoco async call. Consider the request-timeouts middleware.
+- **Abuse limits:** Request body size limits and the built-in rate-limiting middleware, in brief.
+- **What deletion means:** Hard versus soft delete, and the privacy implications for family content ([PRODUCT](../docs/PRODUCT.md)).
+
+### Exercises
+
+1. **You:** Write `learning/dotnet/API.md` covering every endpoint, its request and response shapes, statuses, errors, pagination, and update semantics.
+2. **You:** Implement keyset pagination for `GET /api/recipes` and compare its SQL and behavior with `Page<T>` while inserting rows between page requests.
+3. **You:** Add `[VersionColumn]` and require clients to send `version`. Write an integration test with two clients updating from the same version, asserting a 409 for the second.
+4. **You:** Implement `PATCH` that distinguishes "story not sent" from `"story": ""`. Document the approach you chose.
+5. **You:** Add an allowlisted `sort` parameter and prove that `sort=title;DROP TABLE recipes` is rejected.
+6. **Threat model:** List five ways a hostile client could misuse the API, and the code or constraint that stops each one.
+7. **Vue:** Do V4, and add 409-conflict handling to the edit form.
+
+### Checkpoint
+
+- Explain lost updates and the exact SQL that version checking uses.
+- Offset or keyset pagination: what are the tradeoffs, and which suits an infinite-scroll grid?
+- Why can't `ORDER BY` take a parameter?
+- How does your API tell "not sent" from "set to empty"?
+
+**References:** [Handle errors in APIs (ProblemDetails)](https://learn.microsoft.com/aspnet/core/fundamentals/error-handling), [Rate limiting middleware](https://learn.microsoft.com/aspnet/core/performance/rate-limit), [NPoco version column support](https://github.com/schotime/NPoco/wiki/Version-column-support), [Use The Index, Luke: Paging](https://use-the-index-luke.com/no-offset), [OWASP API Security Top 10](https://owasp.org/API-Security/)
+
+---
+
+## N7: Identity and access
+
+**Why it matters:** Authentication is where frameworks hide the most, and where hiding it is most dangerous to get wrong. Learn the moving parts in ASP.NET Core so that in G12 you can build sessions in Go with vetted building blocks while understanding every step.
+
+### Concepts
+
+- **Authentication versus authorization:** Authentication establishes who you are. Authorization decides what you may do.
+- **Cookie authentication:**
+  - `AddAuthentication().AddCookie(...)` issues an encrypted cookie containing a `ClaimsPrincipal`.
+  - The cookie is protected by **Data Protection** keys. Where are those stored, and what happens to every logged-in user when the keys are lost on a deploy?
+  - Use `HttpOnly`, `Secure`, and `SameSite` flags, sliding expiration, and sign-out.
+- **API behavior:** Older versions of cookie authentication redirect unauthenticated API calls to a login page. Check what .NET 10 does for `[ApiController]` endpoints and pin the behavior you want (401 or 403) with a test.
+- **Passwords:** ASP.NET Core Identity's `PasswordHasher<TUser>` (PBKDF2), or full Identity, or an external provider. **Never build password hashing yourself.**
+- **Authorization:**
+  - `[Authorize]`, `[AllowAnonymous]`, and policies.
+  - **Resource-based authorization** with `IAuthorizationService`, for rules like "only the owner may edit this recipe".
+  - Also enforce ownership in SQL (`WHERE id = @0 AND owner_id = @1`) so that a missed check can't leak data.
+  - Returning 404 versus 403 for other people's records is a tradeoff. Choose one and test it.
+- **CSRF:** Cookie authentication with a single-page app needs antiforgery protection or a strict `SameSite` design. Know which one you rely on.
+- **CORS with credentials:** Explicit origins and `AllowCredentials`, never a wildcard.
+- **JWT tradeoffs:** Know why "store a JWT in localStorage" is a different security model from HttpOnly cookies, and why JWTs make revocation harder. Learning JWTs doesn't make them the right choice for Ma's Cooking.
+
+### Exercises
+
+1. **You:** Add a `users` table and `owner_id` on recipes (migration `0003`). Implement register, login, and logout with cookie authentication and `PasswordHasher`.
+2. **You:** Protect recipe writes. Write tests for anonymous access (401), another user's recipe (your choice of 403 or 404), and the owner (success).
+3. **You:** Decode the cookie in your browser's developer tools. What can you see, and what can't you? Restart the app with ephemeral Data Protection keys and explain why everyone got logged out.
+4. **You:** Look for a CSRF hole: can a form on another origin trigger a state change with the user's cookie? Close it and explain the fix.
+5. **Vue:** Do V5.
+
+### Checkpoint
+
+- Trace a login: password check, principal, cookie, Data Protection, and the next request.
+- Where does ownership get enforced in your API? Name both places.
+- Why must Data Protection keys persist across deploys?
+- Cookies or JWTs for a single-page app talking to its own API: which would you pick, and why?
+
+**References:** [Authentication overview](https://learn.microsoft.com/aspnet/core/security/authentication/), [Cookie authentication](https://learn.microsoft.com/aspnet/core/security/authentication/cookie), [Resource-based authorization](https://learn.microsoft.com/aspnet/core/security/authorization/resourcebased), [Data Protection](https://learn.microsoft.com/aspnet/core/security/data-protection/introduction), [Antiforgery](https://learn.microsoft.com/aspnet/core/security/anti-request-forgery), [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+
+---
+
+## N8: Testing and operations
+
+**Why it matters:** Tests make change safe, and operational basics make a service runnable by someone other than you.
+
+### Concepts
+
+- **The test levels:**
+  - **Unit tests** with xUnit for validation and formatting.
+  - **API tests** with `WebApplicationFactory<Program>`, which runs the real pipeline in memory. If the compiler says `Program` is inaccessible, add `public partial class Program;`.
+  - **Integration tests** against real PostgreSQL. Use a test database, or [Testcontainers](https://dotnet.testcontainers.org/) to start a disposable container per test run.
+  - Reset data between tests with a `TRUNCATE` helper, or a library such as Respawn.
+- **What CRUD tests must cover:** Every documented status code, validation edge cases (empty values, exact limits, multi-byte text), conflicts, authorization, and the constraint backstop.
+- **Test doubles:** Replace services in `WebApplicationFactory` with `ConfigureTestServices` only when a real dependency is impractical. Prefer the real database for data code.
+- **Coverage and analysis:** `dotnet test --collect:"XPlat Code Coverage"`, analyzers, and `dotnet format --verify-no-changes`. Coverage is a flashlight, not a target.
+- **Debugging:**
+  - Breakpoints in your editor and conditional breakpoints.
+  - Read an exception's stack trace starting from the first frame in your own code.
+  - Log NPoco's SQL and inspect the wire with `curl -v`.
+  - Reproduce, form a hypothesis, check it, and only then change code.
+- **Packaging:** `dotnet publish` and SDK container publishing (`dotnet publish -t:PublishContainer`). Environment-specific configuration through environment variables. The production logging level.
+
+### Exercises
+
+1. **You:** Make a table of endpoints and their documented outcomes, mark which ones have tests, and fill the gaps with `WebApplicationFactory` tests.
+2. **You:** Run the integration tests against a disposable PostgreSQL instance and make them independent of order.
+3. **You:** Ask your pair to introduce a subtle bug, such as an off-by-one in pagination or a wrong lifetime. Find it with tests, logs, and the debugger, and explain how you narrowed it down.
+4. **You:** Publish a container image and run it against the database container using only environment variables for configuration.
+
+### Checkpoint
+
+- Which test level catches each of these: a wrong status code, a typo in SQL, a captive dependency, a missing ownership check?
+- Why prefer a real database over mocking `IDatabase` for store tests?
+
+**References:** [Integration tests in ASP.NET Core](https://learn.microsoft.com/aspnet/core/test/integration-tests), [Testcontainers for .NET](https://dotnet.testcontainers.org/), [Containerize an app with dotnet publish](https://learn.microsoft.com/dotnet/core/docker/publish-as-container)
+
+---
+
+## N9: Recipe Box capstone
+
+Finish, harden, and explain Recipe Box: ASP.NET Core, NPoco, PostgreSQL, and Vue.
+
+### Scope
+
+- **Speakers:** create, list, and get. Deleting a speaker who still has recipes returns 409.
+- **Recipes:** full CRUD with validation, keyset pagination, optimistic concurrency, revision history written inside a transaction, and ownership.
+- **Accounts:** register, log in, and log out with cookie authentication.
+- **Health:** an endpoint that reports API and database status.
+- **Vue:** list, detail, create, and edit pages with field errors, conflict handling, and loading, empty, and error states.
+
+### Definition of done
+
+**Functionality and contract**
+
+- [ ] Every endpoint in `API.md` works as documented, verified with tests.
+- [ ] One `ProblemDetails` error shape everywhere, with field errors from validation.
+- [ ] 400, 401, 403 or 404, 409, 500, and 503 each occur in exactly the documented situations.
+
+**Data**
+
+- [ ] The schema can be rebuilt from the migrations on an empty database.
+- [ ] Constraints back up every important rule.
+- [ ] All SQL is parameterized and sorting is allowlisted.
+- [ ] Stories are stored exactly as submitted.
+- [ ] You've read the generated SQL for every NPoco operation you use.
+
+**Tests and operations**
+
+- [ ] Unit, API, and integration tests pass and don't depend on order.
+- [ ] Options are validated on start and logs are structured with request IDs.
+- [ ] Shutdown is graceful.
+- [ ] The README lets a stranger set up the database, run the migrations, and run the API, the Vue app, and the tests.
+
+**Understanding**
+
+- [ ] Without notes, trace `POST /api/recipes` from a Vue form submission through middleware, model binding, validation, the controller, NPoco, SQL, and back to the rendered page.
+- [ ] For every row of the [hidden machinery table](#what-aspnet-core-hides-and-where-go-shows-it), say what ASP.NET did in your app.
+
+**Review prompt:**
+
+> Review learning/dotnet against the N9 definition of done in learning/ROADMAP.md. Report gaps by severity, then correctness issues, then idiomatic C# and Vue. Don't fix anything; I'll address each item.
+
+---
+
+<a id="vue-track"></a>
+
+# Vue track (shared by both backends)
+
+Vue work happens inside whichever backend's project you're working on. Recipe Box's frontend is at `learning/dotnet/web/`, and Ma's Cooking's frontend is decided at Milestone 0. Because the Go and ASP.NET APIs return different error shapes, you'll learn to keep the frontend's API layer as the single place that knows those details.
+
+## V1: Vue 3, TypeScript, and Vite
+
+- **Concepts:**
+  - `npm create vue@latest` with TypeScript.
+  - Single-file components and `<script setup lang="ts">`.
+  - `ref`, `reactive`, `computed`, and `watch`.
+  - Typed `defineProps` and `defineEmits`, and `v-model` on components.
+  - `v-for` with stable keys, `v-if` versus `v-show`, and lifecycle hooks.
+  - Vue DevTools.
+  - If your work uses the Options API, map each concept across to it.
+- **Exercises:** Build a static `RecipeCard` component and a list that renders sample data. Add a filter box using `computed`. Explain exactly what reacts when you type.
+- **Checkpoint:** When do you use `ref` and when `reactive`? Why do list items need stable keys?
+- **References:** [Vue guide](https://vuejs.org/guide/introduction.html), [TypeScript with the Composition API](https://vuejs.org/guide/typescript/composition-api.html)
+
+## V2: Talking to an API
+
+- **Concepts:**
+  - One typed API module per resource, with DTO types that mirror the API contract.
+  - `fetch` with `AbortController`.
+  - Loading, empty, error, and success states.
+  - Composables such as `useRecipes()`.
+  - A Vite dev proxy (`server.proxy`) so the browser sees one origin and CORS doesn't arise in development.
+  - `import.meta.env` for configuration.
+- **Example:**
+
+  ```ts
+  export interface Speaker { id: number; name: string }
+
+  export async function listSpeakers(signal?: AbortSignal): Promise<Speaker[]> {
+    const res = await fetch('/api/speakers', { signal })
+    if (!res.ok) throw new Error(`list speakers: ${res.status}`)
+    return res.json()
+  }
+  ```
+
+- **Exercises:** Show the Recipe Box recipe list from the API, with all four states. Stop the API and make sure the page says something useful. Abort the request when the component unmounts.
+- **Checkpoint:** Why put fetch logic in a module instead of in components? What does the Vite proxy do, and why doesn't production need it?
+- **References:** [Composables](https://vuejs.org/guide/reusability/composables.html), [Vite server proxy](https://vite.dev/config/server-options#server-proxy), [MDN: AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)
+
+## V3: Routing and forms
+
+- **Concepts:**
+  - `vue-router` with list, detail, create, and edit routes, and route parameters.
+  - Form state and client-side validation for user experience, with **the server as the authority**.
+  - Showing server field errors next to their inputs.
+  - Disabling submit while saving to prevent double submits.
+  - Accessible labels and error messages.
+- **Exercises:** Build create and edit forms for recipes. Map `ProblemDetails` field errors onto their inputs. Make sure a keyboard-only user can complete the form.
+- **Checkpoint:** Why can't client-side validation replace server-side validation?
+- **References:** [Vue Router](https://router.vuejs.org/), [Form input bindings](https://vuejs.org/guide/essentials/forms.html)
+
+## V4: State and structure
+
+- **Concepts:** Local state first, then props and emits, then provide and inject. [Pinia](https://pinia.vuejs.org/) is for genuinely shared state, such as the current user. Organize folders by feature. Avoid a global store for data that only one page uses.
+- **Exercises:** Handle 409 conflicts in the edit form by explaining what happened and offering to reload. Add pagination UI. Decide whether anything needs Pinia, and justify the answer.
+- **Checkpoint:** What's the cost of putting everything in a global store?
+
+## V5: Authentication in the browser
+
+- **Concepts:**
+  - Cookie sessions with `credentials: 'include'` when origins differ.
+  - CSRF tokens.
+  - Route guards for user experience only, since **the server enforces access**.
+  - Handling 401 globally in the API module.
+  - Never keeping secrets in frontend code.
+- **Exercises:** Build login and logout pages for Recipe Box, a guard on the edit pages, and a redirect on 401. Prove that disabling the guard doesn't let you edit someone else's recipe.
+- **Checkpoint:** Why is a route guard not security?
+
+## V6: Testing and quality
+
+- **Concepts:** [Vitest](https://vitest.dev/) with [Vue Test Utils](https://test-utils.vuejs.org/), mocking at the API-module boundary, `vue-tsc` type checking, linting, and optionally Playwright for one end-to-end flow.
+- **Exercises:** Test the recipe form: field errors render, submit is disabled while saving, and a conflict message appears on 409.
+- **Checkpoint:** Which frontend behaviors are worth testing, and which aren't?
+
+---
+
+<a id="go-track"></a>
+
+# Go track (about 25%, with Vue)
+
+G0 to G8 teach the Go language in `learning/go/`. G9 onward rebuilds the framework's machinery by hand, practicing briefly in `learning/go/` and then building it for real in **Ma's Cooking**. Each "by hand" stage opens with a table of what ASP.NET did for you.
+
+## G0: Toolchain and workflow
+
+> **Current progress:** Partly done. The practice module exists, the program runs, and two tests pass. See [STATUS](../docs/STATUS.md).
+
+**Why it matters:** Every later stage depends on a fast loop of editing, running, and testing.
+
+### Concepts
+
+- **Module:** A versioned unit of code defined by `go.mod`. The `module` line gives the import path, and the `go` line sets the minimum language version. Dependencies are listed in `go.mod` and verified by `go.sum`. It's like a `.csproj` file and `PackageReference`s, but there's no project file listing source files.
+- **Package:** One directory is one package. `package main` with `func main()` builds an executable, like an `OutputType` of `Exe`.
+- **Core commands:**
+  - `go run .` compiles and runs.
+  - `go build` produces a binary.
+  - `go test ./...` runs every test.
+  - `go vet ./...` catches suspicious code.
+  - `gofmt -l .` lists unformatted files.
+  - `go doc strings.TrimSpace` shows documentation.
+  - `go mod tidy` adds missing dependencies and removes unused ones.
+- **Strict compiler:** Unused imports and unused local variables are errors, not warnings.
+
+### Exercises
+
+1. **You:** Explain each line of `learning/go/go.mod` and compare it with a `.csproj` file.
+2. **You:** Run `go build`, run the binary directly, and compare that with `dotnet publish` output. What does a Go binary need installed on the server, and what does a .NET app need?
+3. **You:** Add an unused variable and an unused import, read both errors, and remove them.
+4. **You:** Run `gofmt -l .` and `go doc fmt.Printf`.
+
+### Checkpoint
+
+- What's the difference between a module and a package?
+- How does `go test` find tests?
+- Without notes: create a new `main` package folder, run it, and add a passing test.
+
+**References:** [Tutorial: Get started](https://go.dev/doc/tutorial/getting-started), [How to write Go code](https://go.dev/doc/code)
+
+---
+
+## G1: Values, types, and control flow
+
+### Concepts
+
+- **Declarations:** `var servings int` starts at its zero value. `title := "Kuy teav"` infers the type, like `var` in C#, and works only inside functions. `const maxTitleLen = 200` declares a constant.
+- **Zero values instead of null:** `0`, `""`, `false`, and `nil` for pointers, slices, maps, channels, functions, and interfaces. A `string` can never be nil, unlike C#.
+- **Explicit conversion:** There are no implicit numeric conversions. `string(65)` is `"A"`. Use `strconv.Itoa` to turn a number into text.
+- **Strings are UTF-8 bytes:**
+  - `len(s)` counts bytes.
+  - `utf8.RuneCountInString(s)` counts code points.
+  - `for i, r := range s` walks runes.
+  - Compare all of this with C#'s UTF-16 `Length`.
+- **Control flow:**
+  - `for` is the only loop: the three-part form, a condition, an infinite loop, `range 10`, or `range collection`.
+  - `if` can take an initializer: `if n := len(s); n > 200 {}`.
+  - `switch` cases don't fall through, and there's no `break` needed.
+- **Shadowing:** `:=` in an inner block creates a new variable.
 
 ### Example
 
 ```go
-type Store struct {
-	pool *pgxpool.Pool
+func main() {
+	language := "ខ្មែរ"
+	fmt.Println(len(language))                    // predict
+	fmt.Println(utf8.RuneCountInString(language)) // predict
+	for i, r := range language {
+		fmt.Printf("byte %d: %q\n", i, r)
+	}
+}
+```
+
+### Exercises
+
+1. **You:** Run the example and compare it with your C# answers from N1. Explain each of the three different "lengths".
+2. **You:** Write `spiceLevel(n int) string` using a `switch` with no condition, with a test.
+3. **You:** Reproduce a shadowing bug with `:=` inside an `if` block. Does `go vet` catch it?
+4. **Discuss:** "Title up to 200 characters" in C# `StringLength`, in Go, and in PostgreSQL `char_length`. Do all three agree for Khmer?
+
+### Checkpoint
+
+- What are the zero values of `string`, `int`, `[]string`, and `*int`?
+- Why does `len("ខ្មែរ")` differ from C#'s `"ខ្មែរ".Length`?
+
+**References:** [A Tour of Go](https://go.dev/tour/basics/1), [Strings, bytes, runes and characters](https://go.dev/blog/strings)
+
+---
+
+## G2: Functions and the testing habit
+
+### Concepts
+
+- **Multiple return values:** `func f() (Recipe, error)`. They replace both `out` parameters and exceptions.
+- **Closures and functions as values:** Like C# lambdas and `Func<>`. Middleware in G10 is built from them.
+- **`defer`:** Runs when the function returns, in last-in, first-out order, with **arguments evaluated immediately**. It's Go's `using` and `finally`.
+- **Tests:**
+  - `func TestXxx(t *testing.T)`. `t.Errorf` reports and continues, and `t.Fatalf` reports and stops.
+  - **Table-driven tests** with `t.Run` subtests are Go's `[Theory]`.
+  - `t.Helper()` marks helper functions.
+  - `go test -run Name -v`, `-count=1`, and `-cover`.
+  - Watch a test fail before trusting it.
+
+### Example
+
+```go
+func TestIsBlank(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{name: "empty", input: "", want: true},
+		{name: "spaces and tabs", input: " \t ", want: true},
+		{name: "khmer word", input: "សម្ល", want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isBlank(tt.input); got != tt.want {
+				t.Errorf("isBlank(%q) = %v, want %v", tt.input, got, tt.want)
+			}
+		})
+	}
+}
+```
+
+### Exercises
+
+1. **You:** Merge the two existing `recipeLabel` tests into one table-driven test with named subtests.
+2. **You:** Break `recipeLabel` and judge whether the failure message would be enough to find the problem without opening the code.
+3. **You:** Port `CookTime.Format` from N1 to Go as `cookTime(minutes int) string`, writing the table test first. Compare the two versions.
+4. **You:** Predict the output of `for i := range 3 { defer fmt.Println(i) }`, then run it.
+5. **You:** Write `newCounter() func() int` and test that two counters don't share state.
+
+### Checkpoint
+
+- How does `defer` compare with `using` and `finally`?
+- When do you use `t.Fatalf` instead of `t.Errorf`?
+
+**References:** [Tutorial: Add a test](https://go.dev/doc/tutorial/add-a-test), [Defer, panic, and recover](https://go.dev/blog/defer-panic-and-recover)
+
+---
+
+## G3: Slices, maps, and strings
+
+### Concepts
+
+- **Slices:** A small header holding a pointer, a length, and a capacity. **Always write `s = append(s, x)`**, because `append` may allocate a new backing array. Slicing shares memory, unlike LINQ's `Skip` and `Take`, which produce new sequences.
+- **Nil versus empty slices:** `var s []T` is nil and `[]T{}` is empty. **JSON encodes nil as `null` and empty as `[]`.**
+- **Maps:**
+  - `v, ok := m[k]` is Go's `TryGetValue`.
+  - Writing to a nil map panics.
+  - **Iteration order is randomized on purpose.**
+  - Maps aren't safe for concurrent writes.
+- **Packages:** `slices` (`Contains`, `Sort`, `SortFunc`, `Index`, `Clone`), `maps`, `strings`, and `strconv`.
+
+### Example: predict before running
+
+```go
+a := []string{"rice", "fish", "lime"}
+b := a[:2]
+b = append(b, "chili")
+fmt.Println(a)
+
+var counts map[string]int
+fmt.Println(counts["khmer"])
+counts["khmer"]++
+```
+
+### Exercises
+
+1. **You:** Run the example and explain each result in terms of length, capacity, and the backing array. Which C# type behaves most like a slice?
+2. **You:** Write `countByLanguage([]string) map[string]int` and test it with `maps.Equal`.
+3. **You:** Write `normalizeTags`, which trims, lowercases, removes duplicates, and sorts, without changing its input. Prove that in a test. Why would doing the same to a cook's *story* violate [ADR 0002](../docs/decisions/0002-preserve-original-content.md)?
+4. **You:** Build a tiny `map[int]string` store with add, get, remove, and sorted listing.
+
+### Checkpoint
+
+- Why `s = append(s, x)`?
+- What's the difference between a nil slice and an empty one, and when does it matter?
+
+**References:** [Go slices: usage and internals](https://go.dev/blog/slices-intro), [Go maps in action](https://go.dev/blog/maps)
+
+---
+
+## G4: Structs, methods, and pointers
+
+### Concepts
+
+- **Structs are values:** Assignment copies them, like a C# `struct`, not a `class`. There are no properties, only fields.
+- **Methods:** `func (r Recipe) Label() string`. A **pointer receiver** (`func (b *Book) Add(...)`) is needed to mutate the receiver, for large structs, or for structs containing a mutex. Keep the choice consistent within a type.
+- **Pointers:** `&x` and `*p`, with no pointer arithmetic. Returning `&local` is safe because escape analysis moves it to the heap.
+- **No constructors:** Write a `NewRecipeBook()` function when the zero value isn't usable.
+- **Exported versus unexported:** Capitalization replaces `public` and `private`, and it applies per package.
+- **Embedding:** Composition with promoted methods, not inheritance. You'll use it in G10 to wrap `http.ResponseWriter`.
+
+### Example
+
+```go
+type Speaker struct {
+	Name     string
+	Relation string
 }
 
+func (s Speaker) Describe() string { return s.Name + " (" + s.Relation + ")" }
+func (s *Speaker) Rename(name string) { s.Name = name }
+
+func main() {
+	speakers := []Speaker{{Name: "Ma", Relation: "mother"}}
+	for _, s := range speakers {
+		s.Rename("Changed")
+	}
+	fmt.Println(speakers) // predict
+}
+```
+
+### Exercises
+
+1. **You:** Explain the example's output and fix the loop. What would happen with a C# `class` instead, and with a C# `struct`?
+2. **You:** Define a `Recipe` struct with a `Label()` method that replaces `recipeLabel`.
+3. **You:** Build an in-memory `RecipeBook` with `Add`, `Get`, `List`, `Update`, and `Delete`, plus tests. It mirrors the N2 `RecipeBook` on purpose.
+4. **You:** Change `Add` to a value receiver and watch the tests fail.
+
+### Checkpoint
+
+- When do you use a pointer receiver?
+- How do Go structs differ from C# classes and from C# structs?
+
+**References:** [A Tour of Go: Methods](https://go.dev/tour/methods/1), [Go FAQ: Methods on values or pointers](https://go.dev/doc/faq#methods_on_values_or_pointers)
+
+---
+
+## G5: Errors as values
+
+**What ASP.NET hid:** Exceptions travel up the stack until the exception handler middleware catches them. In Go, **every failure is a value you can see at each step**, and you decide its HTTP meaning explicitly.
+
+### Concepts
+
+- **The `error` interface:** Return it last; `nil` means success. Check it with `if err != nil { return ..., fmt.Errorf("context: %w", err) }`.
+- **Sentinel errors:** Values such as `var ErrNotFound = errors.New("not found")`, checked with `errors.Is`. This is the equivalent of catching a specific exception type, without unwinding the stack.
+- **Custom error types:** Structs carrying data, extracted with `errors.As`. This is like an exception filter, `catch (ValidationException e)`.
+- **Handle each error once:** Either log and respond, or wrap and return. Never both.
+- **`panic` is for bugs only:** `recover` belongs at boundaries, like the exception handler middleware.
+- **The nil interface trap:** A nil `*ValidationError` stored in an `error` is not nil.
+
+### Example
+
+```go
+var ErrNotFound = errors.New("not found")
+
+type ValidationError struct {
+	Fields map[string]string
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("invalid input: %d field(s)", len(e.Fields))
+}
+
+func describe(err error) string {
+	var verr *ValidationError
+	switch {
+	case errors.Is(err, ErrNotFound):
+		return "missing"
+	case errors.As(err, &verr):
+		return fmt.Sprintf("invalid: %v", verr.Fields)
+	default:
+		return "unexpected"
+	}
+}
+```
+
+### Exercises
+
+1. **You:** Make `RecipeBook.Get`, `Update`, and `Delete` return a wrapped `ErrNotFound`, and test them with `errors.Is`.
+2. **You:** Write `ValidateRecipe(r Recipe) error`, returning all field problems at once and never trimming the story. Compare it with your data annotations from N2. What did `[Required]` and `[StringLength]` do that you now have to write yourself?
+3. **You:** Reproduce the nil interface trap in a test, then fix it.
+
+### Checkpoint
+
+- When do you use `errors.Is` and when `errors.As`? What are the C# equivalents?
+- What do you gain and lose compared with exceptions?
+
+**References:** [Error handling and Go](https://go.dev/blog/error-handling-and-go), [Working with errors in Go 1.13](https://go.dev/blog/go1.13-errors)
+
+---
+
+## G6: Interfaces, packages, and a little generics
+
+**What ASP.NET hid:** C# culture often puts an interface in front of every service so the container can inject it. Go interfaces are **implicit and defined by the code that consumes them**. You add one when you need it, not because a container expects it.
+
+### Concepts
+
+- **Implicit satisfaction:** A type that has the methods satisfies the interface, with no `: IFoo`. The most useful interfaces are tiny: `io.Reader`, `io.Writer`, `fmt.Stringer`, `error`, and `http.Handler`.
+- **"Accept interfaces, return structs":** The consumer declares the small interface it needs, and the provider returns a concrete type.
+- **Compile-time check:** `var _ Getter = (*RecipeBook)(nil)` fails to compile if `RecipeBook` stops satisfying `Getter`.
+- **Packages:**
+  - Short lowercase names, and no stutter: write `recipes.Store`, not `recipes.RecipeStore`.
+  - An `internal/` directory can't be imported from outside its parent, a little like `internal` in C#.
+  - **Import cycles are compile errors**, so plan the direction of dependencies.
+- **Generics:** `func Filter[T any](...)`. They're useful for algorithms and rarely for business logic. There's no "generic repository".
+
+### Exercises
+
+1. **You:** Implement `String()` on `Recipe`, then write `printAll(w io.Writer, recipes []Recipe)` and test it with a `bytes.Buffer`.
+2. **You:** Move `RecipeBook` into a `learning/go/recipebook/` package and fix what breaks. What did capitalization have to do with it?
+3. **You:** Write a consumer-side `recipeGetter` interface and a fake for a test. Then **discuss**: was it worth it here? How would your team decide this in C#?
+
+### Checkpoint
+
+- How does a type satisfy an interface in Go, compared with C#?
+- When does an interface become premature abstraction?
+
+**References:** [Effective Go: Interfaces](https://go.dev/doc/effective_go#interfaces), [Go Code Review Comments: Interfaces](https://go.dev/wiki/CodeReviewComments#interfaces), [When to use generics](https://go.dev/blog/when-generics)
+
+---
+
+## G7: Files, JSON, and a small CLI
+
+**What ASP.NET hid:** `System.Text.Json` with web defaults gives you camelCase, case-insensitive matching, and model binding. In Go, **struct tags control names**, and you can see exactly how missing fields behave.
+
+### Concepts
+
+- **Files:** `os.ReadFile` and `os.WriteFile`, and `errors.Is(err, fs.ErrNotExist)` for a missing file. `t.TempDir()` gives each test a clean directory.
+- **`encoding/json`:**
+  - Tags such as `` `json:"createdAt"` `` rename fields, `omitempty` skips zero values, and `-` skips a field entirely. Only exported fields are encoded.
+  - Go matches JSON keys to fields case-insensitively when decoding, but it **encodes with the exact field name unless you add a tag**.
+  - **Missing fields become zero values.** Use pointer fields (`*string`) to detect "not sent", which is the Go answer to the PATCH problem in N6.
+  - `Decoder.DisallowUnknownFields()` rejects fields you don't recognize.
+- **Command-line basics:** `os.Args`, `flag.NewFlagSet` for each subcommand, errors written to `os.Stderr`, and `os.Exit(1)` on failure.
+
+### Exercises
+
+1. **You:** Marshal a `Recipe` with and without tags. Compare the output with what ASP.NET returned in N2.
+2. **You:** Unmarshal `{}` into a struct with pointer fields and into one without. Explain the difference in terms of PATCH.
+3. **Foundations exit project:** Build `learning/go/recipebox/`, a command-line tool for `add`, `list`, `show`, `edit`, and `delete` that saves to a JSON file. Reuse `RecipeBook`, validation, and errors from earlier stages, and write tests for everything except `main`.
+
+### Checkpoint
+
+- How do you tell a missing JSON field from an empty one in Go? And in C#?
+- Why keep the shapes on the wire separate from internal types?
+
+**References:** [JSON and Go](https://go.dev/blog/json), [`encoding/json`](https://pkg.go.dev/encoding/json), [`flag`](https://pkg.go.dev/flag)
+
+---
+
+## G8: Just enough concurrency
+
+**What ASP.NET hid:** Kestrel schedules requests onto the thread pool, `async`/`await` keeps threads free, and `CancellationToken` arrives already bound to the request. In Go, **every request is a goroutine**, calls simply block, and you pass `context.Context` yourself.
+
+### Concepts
+
+- **Goroutines:** `go f()`. They're cheap, and blocking inside them is normal. Go has no `async` keyword and no function coloring, so a function that waits looks the same as one that doesn't.
+- **Data races:** `sync.Mutex` around a map is Go's `lock` statement. `go test -race` detects races **reliably when they happen**, unlike flaky C# tests.
+- **`sync.WaitGroup`:** `wg.Go(func() { ... })` starts a goroutine and tracks it, similar to `Task.WhenAll`.
+- **Channels:** Learn enough to read code. Unbuffered channels hand off one value at a time, buffered channels have capacity, and `select` waits on several. They're similar to `System.Threading.Channels`.
+- **`context.Context`:** Go's `CancellationToken` plus deadlines. It's the first parameter by convention, never stored in a struct. It starts from `r.Context()`. Always `defer cancel()` after `context.WithTimeout`.
+
+### Example
+
+```go
+func waitForOven(ctx context.Context, d time.Duration) error {
+	select {
+	case <-time.After(d):
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+```
+
+### Exercises
+
+1. **You:** Call `RecipeBook.Add` from 100 goroutines in a test. Run it with `-race`, read the report, fix it with a mutex, and compare the experience with the C# test from N2.
+2. **You:** Test `waitForOven` with a timeout that fires before the oven finishes and one that doesn't.
+3. **Discuss:** Map `context.Context` onto `CancellationToken` and `CancellationTokenSource`. What does Go's version carry that C#'s doesn't?
+
+### Checkpoint
+
+- Why does an in-memory store in an HTTP server need a mutex in both stacks?
+- What does the race detector catch, and what can it miss?
+
+> **Go readiness review.** Check the Go foundations exit criteria in the [project roadmap](../docs/ROADMAP.md): implement a modest program with occasional hints, handle a failure, write useful tests, and explain data flow and design choices. The G7 command-line tool is the evidence. Record the result in LEARNING and **reconfirm the collaboration mode** before starting Ma's Cooking application code.
+
+**References:** [Data race detector](https://go.dev/doc/articles/race_detector), [Go concurrency patterns: Context](https://go.dev/blog/context), [`sync`](https://pkg.go.dev/sync)
+
+---
+
+## G9: HTTP by hand
+
+**Ma's Cooking target:** Milestone 0, a Go HTTP response and `GET /api/health`, then Vue calling it.
+
+| ASP.NET Core did | You now write |
+| --- | --- |
+| Kestrel and the host | `http.Server` (timeouts come in G10) |
+| Attribute routing and constraints | `mux.HandleFunc("GET /api/recipes/{id}", ...)`, then `strconv.ParseInt(r.PathValue("id"), 10, 64)` |
+| `[FromBody]` binding and size limits | `http.MaxBytesReader`, `json.NewDecoder`, `DisallowUnknownFields` |
+| `[ApiController]` automatic 400 responses | Calling your validator and writing the error yourself |
+| `ProblemDetails` | Your own JSON error shape, or [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) |
+| `CreatedAtAction`, `NoContent` | Setting `Location`, calling `WriteHeader(201)` or `204` |
+| Output formatters | A `writeJSON` helper |
+| `WebApplicationFactory` | `httptest.NewRecorder` sending requests through the mux |
+
+### Concepts
+
+- **`http.Handler`:** An interface with one method, `ServeHTTP(w, r)`. `http.HandlerFunc` adapts an ordinary function into one. Middleware, muxes, and endpoints are all handlers.
+- **`ServeMux`:** Patterns combine a method and a path. A wrong method automatically gets `405 Method Not Allowed`.
+- **Writing a response:** Set headers, then call `WriteHeader`, then write the body. **`return` right after writing an error.**
+- **Reading JSON safely:** Limit the size, reject unknown fields, and reject trailing data.
+- **Lists:** Return `[]`, never `null`.
+- **Errors to clients:** Log the details and send a generic 500.
+
+### Example
+
+```go
+type application struct {
+	logger  *slog.Logger
+	recipes *RecipeBook
+}
+
+func (app *application) routes() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /api/health", app.health)
+	mux.HandleFunc("GET /api/recipes/{id}", app.getRecipe)
+	return mux
+}
+
+func writeJSON(w http.ResponseWriter, status int, v any) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	return json.NewEncoder(w).Encode(v)
+}
+```
+
+### Exercises
+
+1. **Practice in `learning/go/httpbasics/`:**
+   - Serve `/api/health` and inspect it with `curl -i`.
+   - Implement in-memory `GET` and `POST` for recipes using `RecipeBook`.
+   - Write a `decodeJSON` helper.
+   - Write `httptest` tests for 200, 201, 400, 404, and 405.
+2. **Replay your N2 notes:** For each experiment (malformed JSON, a missing field, an unknown field, `null`, a bad ID, a huge body), make Go behave the way you *want*, which might differ from ASP.NET's defaults. Write down each decision.
+3. **Remove a `return`** after an error response and read the `superfluous response.WriteHeader call` log message.
+4. **Ma's Cooking:** With the collaboration mode reconfirmed, start Milestone 0: a Go `GET /api/health` and a Vue page that displays its result, using V2 skills.
+
+### Checkpoint
+
+- What is `http.Handler`, and why can middleware and muxes be handlers too?
+- List everything `[ApiController]` did for one `POST` that you wrote by hand.
+
+**References:** [`net/http`](https://pkg.go.dev/net/http), [Routing enhancements for Go 1.22](https://go.dev/blog/routing-enhancements), [`httptest`](https://pkg.go.dev/net/http/httptest)
+
+---
+
+## G10: Service plumbing by hand
+
+**Ma's Cooking target:** Milestone 0, with documented configuration, logging, and a clean startup and shutdown.
+
+| ASP.NET Core did | You now write |
+| --- | --- |
+| The DI container and lifetimes | `main` constructs every dependency once and passes it into structs. "Scoped" becomes "created inside the handler" or "carried in the request context". |
+| `IConfiguration` and validated options | `loadConfig(getenv func(string) string) (config, error)` that fails fast |
+| `ILogger<T>` | A `*slog.Logger` passed in, with text output locally and JSON in production |
+| `app.Use(...)` | `func(next http.Handler) http.Handler` |
+| `UseExceptionHandler` | Recovery middleware that returns a JSON 500 |
+| The host's `SIGTERM` handling | `signal.NotifyContext` and `srv.Shutdown(ctx)` |
+| Kestrel's limits | `ReadHeaderTimeout`, `ReadTimeout`, `WriteTimeout`, and `IdleTimeout` on `http.Server` |
+
+### Concepts
+
+- **`main` as the composition root:** Load configuration, build the logger, open dependencies, build the `application`, serve, wait for a signal, and shut down. Keep `main` tiny and put the work in `run(ctx, getenv) error` so it can be tested.
+- **Binding:** Hosts such as Render set `PORT` and expect the app on `0.0.0.0:$PORT`.
+- **Capturing the status code:** Wrap `http.ResponseWriter` by embedding it (G4) to record the status for logging.
+- **Layout:** Start flat, with `main.go`, `routes.go`, `handlers.go`, `store.go`, `errors.go`, and `middleware.go`. Split into packages when the flat layout hurts.
+
+### Example
+
+```go
+type statusRecorder struct {
+	http.ResponseWriter
+	status int
+}
+
+func (r *statusRecorder) WriteHeader(code int) {
+	r.status = code
+	r.ResponseWriter.WriteHeader(code)
+}
+
+srv := &http.Server{
+	Addr:              cfg.addr,
+	Handler:           app.routes(),
+	ReadHeaderTimeout: 5 * time.Second,
+	ReadTimeout:       15 * time.Second,
+	WriteTimeout:      15 * time.Second,
+	IdleTimeout:       60 * time.Second,
+}
+
+serverErr := make(chan error, 1)
+go func() { serverErr <- srv.ListenAndServe() }()
+
+select {
+case err := <-serverErr:
+	return err
+case <-ctx.Done():
+}
+
+shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+defer cancel()
+return srv.Shutdown(shutdownCtx)
+```
+
+### Exercises
+
+1. **You:** Write `loadConfig` with tests that pass a fake `getenv`. Compare it with the N5 options validation.
+2. **You:** Write logging middleware with `statusRecorder`. What should `status` start as, and why? Add a request ID.
+3. **You:** Write recovery middleware and compare its behavior with N5's `IExceptionHandler`.
+4. **You:** Implement graceful shutdown and repeat the N5 sleep experiment.
+5. **Ma's Cooking:** Apply all of this to the Milestone 0 service and document the run commands in the README.
+6. **Reflect:** Your Go `main` now does what `WebApplication.CreateBuilder` did. Count the lines. What did you deliberately leave out?
+
+### Checkpoint
+
+- Walk through `main` and say what each step is for and what the ASP.NET equivalent was.
+- How do "scoped" services translate to Go?
+
+**References:** [Structured logging with slog](https://go.dev/blog/slog), [`http.Server`](https://pkg.go.dev/net/http#Server), [`os/signal`](https://pkg.go.dev/os/signal)
+
+---
+
+## G11: PostgreSQL by hand with pgx
+
+**Ma's Cooking target:** Milestone 0's database-aware health check, then **Milestone 1**, one recipe round trip with a migration.
+
+| NPoco and Npgsql did | You now write |
+| --- | --- |
+| A pool behind each connection string | One `pgxpool.Pool` created at startup, pinged, shared, and closed on shutdown |
+| Reflection mapping and `[Column]` attributes | `QueryRow(...).Scan(&r.ID, &r.Title, ...)`, one destination per column |
+| Generated `INSERT` and `UPDATE` statements | The SQL itself, with `RETURNING` |
+| `@0` parameters | `$1` parameters, passed straight through |
+| `SingleOrDefaultById` returning `null` | `errors.Is(err, pgx.ErrNoRows)` mapped to `ErrNotFound` |
+| `GetTransaction()` and `Complete()` | `tx, _ := pool.Begin(ctx)`, `defer tx.Rollback(ctx)`, `tx.Commit(ctx)` |
+| `PostgresException.SqlState` | `var pgErr *pgconn.PgError; errors.As(err, &pgErr); pgErr.Code` |
+| The `CancellationToken` overloads | `ctx` as the first argument of every call |
+| `AddHealthChecks` with a database check | A handler that calls `pool.Ping` with a one-second timeout and returns 503 |
+
+### Concepts
+
+- **The driver:** [`pgx`](https://pkg.go.dev/github.com/jackc/pgx/v5) is PostgreSQL-specific and comes with `pgxpool`. The project leans toward it in [ARCHITECTURE](../docs/ARCHITECTURE.md). It's probably your first Go dependency, so look at what changes in `go.mod` and `go.sum`.
+- **Three query shapes:**
+  - `QueryRow().Scan()` for one row.
+  - `Query()` followed by `for rows.Next()`, then `rows.Err()`, with `defer rows.Close()`.
+  - `Exec()` with `RowsAffected()` for writes.
+- **The layer rule:** The store knows SQL and the handler knows HTTP. Domain errors (`ErrNotFound`, `ErrConflict`) cross the boundary between them.
+- **Nullable columns:** They need pointers or `pgtype` types, which is one more reason to prefer `NOT NULL`.
+- **Integration tests:**
+  - Use `TEST_DATABASE_URL` and call `t.Skip` when it isn't set.
+  - Reset the tables between tests.
+  - Packages run their tests in parallel, so use `go test -p 1` if several packages share one database.
+- **Migrations:** Reuse the plain SQL approach from N3. Choose a migration tool only for a concrete need, and record the choice in an ADR if it lasts.
+
+### Example
+
+```go
 func (s *Store) GetRecipe(ctx context.Context, id int64) (Recipe, error) {
 	const q = `
-		SELECT id, speaker_id, title, language, story, version, created_at, updated_at
+		SELECT id, title, language, story, created_at
 		FROM recipes
 		WHERE id = $1`
 
 	var r Recipe
-	err := s.pool.QueryRow(ctx, q, id).Scan(
-		&r.ID, &r.SpeakerID, &r.Title, &r.Language, &r.Story,
-		&r.Version, &r.CreatedAt, &r.UpdatedAt,
-	)
+	err := s.pool.QueryRow(ctx, q, id).Scan(&r.ID, &r.Title, &r.Language, &r.Story, &r.CreatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return Recipe{}, ErrNotFound
 	}
@@ -1178,389 +1454,189 @@ func (s *Store) GetRecipe(ctx context.Context, id int64) (Recipe, error) {
 }
 ```
 
-Shape of a transaction:
-
-```go
-tx, err := s.pool.Begin(ctx)
-if err != nil {
-	return fmt.Errorf("begin: %w", err)
-}
-defer tx.Rollback(ctx) // harmless after Commit
-
-// ... several tx.Exec / tx.QueryRow calls; return early on any error ...
-
-if err := tx.Commit(ctx); err != nil {
-	return fmt.Errorf("commit: %w", err)
-}
-return nil
-```
-
-Test helper shape:
-
-```go
-func newTestStore(t *testing.T) *Store {
-	t.Helper()
-	url := os.Getenv("TEST_DATABASE_URL")
-	if url == "" {
-		t.Skip("TEST_DATABASE_URL not set; skipping database test")
-	}
-	pool, err := pgxpool.New(context.Background(), url)
-	if err != nil {
-		t.Fatalf("connect: %v", err)
-	}
-	t.Cleanup(pool.Close)
-	// reset tables here so each test starts clean
-	return &Store{pool: pool}
-}
-```
-
 ### Exercises
 
-1. **You:** Write a tiny program that connects and pings. Break the password, the port, and the database name in turn, and read each error. Which ones would you want a startup log to show, and which parts of the URL must never be logged?
-2. **You:** Implement `CreateRecipe` with `INSERT ... RETURNING`. Write an integration test that creates a recipe and reads it back.
-3. **You:** Implement `GetRecipe`, `ListRecipes` (returning an empty slice, not nil, when there are no rows), `UpdateRecipe`, and `DeleteRecipe` using `RowsAffected`. Test both the found and not-found cases.
-4. **You:** Map the PostgreSQL errors from Stage 11, exercise 3, to domain errors. Write a test that creates a recipe for a nonexistent speaker and asserts your domain error.
-5. **You:** Swap the HTTP handlers from `RecipeBook` to `Store`. **Discuss:** did the handler code change much? If you had introduced an interface in Stage 6, did it help? Do you still need `RecipeBook`?
-6. **You:** Make `GET /api/health` ping the database with a one-second timeout, returning 503 if it fails. Stop PostgreSQL and watch the response change.
-7. **Experiment:** In a scratch function, build a query by concatenating user input and pass in `1 OR 1=1`. See what happens, then fix it with a parameter. Delete the scratch function afterwards.
-8. **You:** Add a `recipe_revisions` table and make `UpdateRecipe` transactional: copy the current row into `recipe_revisions`, update the recipe, and increment `version`. Force an error between the two steps and prove nothing was written. This pattern preserves original content when people edit, in the spirit of [ADR 0002](../docs/decisions/0002-preserve-original-content.md).
+1. **You:** Connect and ping, then break the password, the port, and the database name in turn and read each error. Which parts of the URL must never appear in logs?
+2. **Ma's Cooking:** Make `GET /api/health` report database status and return 503 when PostgreSQL is stopped. Show it in the Vue page. This completes Milestone 0.
+3. **Ma's Cooking, Milestone 1:** Write the first migration, implement create and read through Go, validate input, display the recipe in Vue, and write an integration test for valid persistence and invalid input.
+4. **Compare:** Put your NPoco SQL notes from N4 next to your hand-written SQL. Where was NPoco doing more than you expected, and where less?
+5. **Experiment:** Build a query by string concatenation in a scratch function, inject `1 OR 1=1`, fix it with a parameter, and delete the scratch function.
 
 ### Checkpoint
 
-- Trace `GET /api/recipes/7`: handler, then store, then SQL, then `Scan`, then the error mapping, then JSON. Say which layer owns each decision.
-- Why is `defer tx.Rollback(ctx)` safe after a successful commit?
-- What's the difference between `rows.Err()` and the error from `Scan`?
-- Why test against a real PostgreSQL database instead of mocking `pgx`?
+- Trace `GET /api/recipes/7` through the handler, store, SQL, `Scan`, error mapping, and JSON, and compare each step with the NPoco version.
+- Why is `defer tx.Rollback(ctx)` safe after a commit? What is NPoco's equivalent?
 
-**References:** [Accessing relational databases (Go docs)](https://go.dev/doc/database/), [`pgx` v5](https://pkg.go.dev/github.com/jackc/pgx/v5), [`pgxpool`](https://pkg.go.dev/github.com/jackc/pgx/v5/pgxpool), [`pgconn.PgError`](https://pkg.go.dev/github.com/jackc/pgx/v5/pgconn#PgError)
+**References:** [Accessing relational databases](https://go.dev/doc/database/), [`pgx` v5](https://pkg.go.dev/github.com/jackc/pgx/v5), [`pgxpool`](https://pkg.go.dev/github.com/jackc/pgx/v5/pgxpool), [`pgconn.PgError`](https://pkg.go.dev/github.com/jackc/pgx/v5/pgconn#PgError)
 
 ---
 
-## Stage 13: Making CRUD well made
+## G12: Quality and access by hand
 
-**Why it matters:** Most CRUD code "works". Well-made CRUD code survives bad input, simultaneous edits, large lists, and malicious users, and it documents what it promises. This stage turns your API into one you'd be comfortable showing a senior engineer.
+**Ma's Cooking target:** Milestone 1's invalid-input handling, then **Milestone 2**, recipe lifecycle and access.
+
+| ASP.NET Core and NPoco did | You now write |
+| --- | --- |
+| `[VersionColumn]` and `DBConcurrencyException` | `UPDATE ... SET version = version + 1 WHERE id = $1 AND version = $2`, then telling 404 from 409 when no rows changed |
+| `Page<T>` | Keyset pagination SQL and a capped `limit` |
+| Cookie authentication and Data Protection | A `sessions` table, a 32-byte `crypto/rand` token sent as an `HttpOnly`, `Secure`, `SameSite` cookie, and the token **hashed** in the database |
+| `ClaimsPrincipal` and `HttpContext.User` | Middleware that loads the user and stores it in the request context |
+| `[Authorize]` and resource-based authorization | A `requireUser` middleware and `WHERE owner_id = $2` in every write |
+| `PasswordHasher<TUser>` | `golang.org/x/crypto` (argon2id or bcrypt). **Still never hand-rolled.** |
+| Antiforgery | A deliberate CSRF strategy: a `SameSite` policy plus a token or origin check |
+| OpenAPI generation | Keeping `API.md` up to date by hand |
 
 ### Concepts
 
-- **Three layers of validation:**
-  1. Decoding checks the shape: is it JSON, with known fields and a size within limits?
-  2. Validation checks the rules: required fields and lengths in runes.
-  3. Database constraints are the backstop.
-
-  Return **all** field errors at once so a form can show them together. Check `utf8.ValidString` on text input.
-- **Preserve what the user wrote:** Don't silently trim, normalize, or rewrite stories and transcripts. If you trim a title only to check whether it's empty, decide whether to store the original or the trimmed value, and make that choice deliberately and documented ([ADR 0002](../docs/decisions/0002-preserve-original-content.md)).
-- **The API contract:**
-  - One error shape.
-  - A documented status code for every case.
-  - One JSON naming convention, `camelCase` or `snake_case`. Pick one.
-  - **JavaScript numbers lose precision above 2^53.** An `int64` ID is fine at this scale, but know why some APIs send IDs as strings or use UUIDs.
-- **Pagination:**
-  - Always cap `limit`, with a default and a maximum.
-  - **Offset pagination** (`LIMIT/OFFSET`) is simple, but it gets slower deep into the list and can skip or repeat rows when data changes.
-  - **Keyset pagination** (`WHERE (created_at, id) < ($1, $2) ORDER BY created_at DESC, id DESC LIMIT $3`) is stable and fast.
-  - Always add a unique tiebreaker to `ORDER BY`.
-- **Filtering and sorting safely:** Allowlist the sort options with something like `map[string]string{"newest": "created_at DESC, id DESC", "title": "title ASC, id ASC"}`. Never interpolate raw user input into SQL.
-- **PUT versus PATCH:** `PUT` replaces the whole resource. `PATCH` applies a partial update, using pointer fields to detect what was sent (Stage 7). Choose what you support and document it. Set `updated_at = now()` in SQL rather than trusting the client's clock.
-- **Lost updates and optimistic locking:**
-  - The problem: two people load version 3 and both save, and the second save silently erases the first.
-  - The fix: `UPDATE ... WHERE id = $1 AND version = $2`, then `SET version = version + 1`.
-  - Zero affected rows means not found (404) or stale (409 Conflict). Check which one.
-  - ETags with `If-Match` are the HTTP-standard version of the same idea.
-- **What deletion means:**
-  - A hard delete removes the row. A soft delete sets `deleted_at`, and every query then has to filter it out.
-  - For family content, "delete" may have to really mean delete, including media and eventually backups (see [PRODUCT](../docs/PRODUCT.md)).
-  - Decide on purpose, and decide whether `DELETE` is idempotent.
-- **Idempotency:** `GET`, `PUT`, and `DELETE` are idempotent and `POST` isn't. Plan for double-submits from the UI.
-- **Authorization preview (Milestone 2):**
-  - **Authentication** establishes who you are. **Authorization** decides what you may do.
-  - Enforce ownership in the query itself: `WHERE id = $1 AND owner_id = $2`. Never trust an owner ID sent by the client.
-  - Returning 404 instead of 403 for another user's record hides whether it exists. Choose one and test it.
-  - Sessions in `HttpOnly`, `Secure`, `SameSite` cookies are a different design from JWTs, with different tradeoffs.
-  - Hash passwords with a vetted library such as `golang.org/x/crypto` (argon2id or bcrypt), or use an identity provider. **Don't build security primitives yourself.**
-  - Cookie-based sessions need CSRF protection.
-- **Security basics checklist:** Parameterized SQL, body size limits, server timeouts, secrets only in environment variables, `.env` files in `.gitignore`, no secrets or personal data in logs, and generic 500 messages.
+Everything from N6 and N7 applies. The difference is that you now see the SQL, the cookie flags, and the context plumbing directly. **Building authentication by hand is for understanding.** Use vetted primitives for hashing and randomness, and record the authentication approach in an ADR before Ma's Cooking stores real accounts ([ARCHITECTURE](../docs/ARCHITECTURE.md)).
 
 ### Exercises
 
-1. **You:** Write `learning/recipebox/API.md` documenting every endpoint, its request and response shapes, status codes, error format, pagination, and update semantics. Keep it in sync from now on.
-2. **You:** Add `limit` and cursor-based pagination to `GET /api/recipes`. Test the default limit, the maximum limit, invalid values, a stable order with equal timestamps, and an empty final page.
-3. **You:** Add optimistic locking to `PUT`. The client must send `version`. Write a test that simulates two clients updating from the same version and asserts that the second gets 409.
-4. **You:** Implement `PATCH /api/recipes/{id}` with pointer fields. Test that "story not sent" leaves the story unchanged while `"story": ""` clears it.
-5. **You:** Add an allowlisted `sort` parameter. Try `sort=title;DROP TABLE recipes` and show that it's rejected.
-6. **Threat-model exercise:** List five ways a hostile client could misuse your API, such as a huge body, a giant `limit`, an injection attempt, a race between updates, or guessing IDs. For each, point to the code or constraint that stops it, or admit that nothing does yet.
-7. **Discuss:** For Ma's Cooking, should deletion be hard or soft, and what about edits? Draft the questions an ADR would need to answer. You don't have to decide yet.
+1. **Practice:** In `learning/go/`, add optimistic locking to the practice store with a test that simulates two clients.
+2. **Practice:** Build a minimal session login against a test table. Use a random token, store only its hash, and send it in a cookie with the right flags. Write tests for no cookie, an expired session, and another user's record.
+3. **Ma's Cooking, Milestone 2:** Only after the authentication approach and the identity and visibility decisions are recorded as the milestone requires, implement ownership and unauthorized-access tests.
+4. **Compare:** Write a short note on which authentication responsibilities ASP.NET handled for you that you had to think about in Go.
 
 ### Checkpoint
 
-- Explain the lost-update problem and how version checks solve it.
-- Offset or keyset pagination: what are the tradeoffs, and which would you choose for an infinite-scroll grid?
-- Why can't `ORDER BY` take a parameter, and what do you do instead?
-- What's the difference between authentication and authorization, and where in your code would ownership be enforced?
+- Why store a hash of the session token rather than the token itself?
+- Where is ownership enforced in your Go API? Name both places.
 
-**References:** [OWASP API Security Top 10](https://owasp.org/API-Security/), [OWASP Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html), [Use The Index, Luke: Paging](https://use-the-index-luke.com/no-offset), [RFC 9110: HTTP semantics, method idempotency](https://www.rfc-editor.org/rfc/rfc9110#name-idempotent-methods)
+**References:** [`crypto/rand`](https://pkg.go.dev/crypto/rand), [`golang.org/x/crypto/argon2`](https://pkg.go.dev/golang.org/x/crypto/argon2), [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
 
 ---
 
-## Stage 14: Testing, debugging, and tooling
-
-**Why it matters:** Tests make change safe, and debugging skill makes failures cheap. This stage pulls together what you've been doing since Stage 2 into a deliberate strategy.
+## G13: Testing and debugging Go
 
 ### Concepts
 
-- **A test strategy for this app:**
-  - **Unit tests** for pure logic: validation, formatting, and pagination cursors. These are fast and plentiful.
-  - **Handler tests** with `httptest`, covering status codes, error bodies, and headers.
-  - **Store integration tests** against real PostgreSQL, covering SQL correctness, constraints, transactions, and error mapping.
-  - **A smoke test:** a short `curl` script, or a Go test that starts the real server, exercising one full CRUD cycle.
-- **What CRUD tests must cover:**
-  - The success path of every endpoint.
-  - Every documented failure status.
-  - Validation edge cases: empty values, exact length limits, multi-byte text, and invalid UTF-8.
-  - Not found, conflicts, and the constraint backstop.
-- **Test tools:**
-  - `t.Helper`, `t.Cleanup`, `t.TempDir`, `t.Setenv`, and `t.Context()`. `t.Context()` is cancelled when the test ends, but before cleanup functions run.
-  - A `testdata/` directory for fixtures.
-  - Golden files for large expected outputs.
-- **Comparing values:** Use `==` for comparable types, `reflect.DeepEqual` or `slices.Equal`/`maps.Equal` for collections, and optionally [`go-cmp`](https://pkg.go.dev/github.com/google/go-cmp/cmp) for readable diffs between structs. Compare times with `time.Time.Equal`, not `==`.
-- **The race detector:** `go test -race ./...` belongs in your normal routine.
-- **Fuzzing:** `func FuzzValidate(f *testing.F)` generates inputs automatically. Run it with `go test -fuzz=FuzzValidate -fuzztime=30s`. It's very good at finding validation and parsing bugs.
-- **Coverage:** `go test -coverprofile=c.out ./...` followed by `go tool cover -html=c.out`. Use coverage like a flashlight to find untested error paths, not as a target number.
-- **Static analysis:** `go vet` always. [`staticcheck`](https://staticcheck.dev/) is optional and highly regarded, and `golangci-lint` is optional and heavier.
-- **Debugging:**
-  - Reproduce the problem, form a hypothesis, check it, and only then change code. **Establish the cause before replacing code.**
-  - Read panic stack traces: the first frame in *your* code is usually the place to look.
-  - Use [Delve](https://github.com/go-delve/delve) (`dlv test`, `dlv debug`) or the editor's debugger to step through code and set breakpoints.
-  - Print values with `%+v` and log at `slog` debug level.
-  - Inspect the wire with `curl -v` and the data with `psql`.
-- **Benchmarks (optional):** `func BenchmarkX(b *testing.B) { for b.Loop() { ... } }`. Measure before you optimize.
+- **The test levels:** unit tests, handler tests with `httptest`, store integration tests against PostgreSQL, and one smoke test of a full CRUD cycle.
+- **Test helpers:** `t.Helper`, `t.Cleanup`, `t.TempDir`, `t.Setenv`, `t.Context()`, and a `testdata/` directory.
+- **Fuzzing:** `func FuzzValidate(f *testing.F)`, run with `go test -fuzz=FuzzValidate -fuzztime=30s`. C# has no built-in equivalent.
+- **Race detection:** `go test -race ./...` as part of your normal routine.
+- **Coverage:** `go test -coverprofile=c.out ./...` and `go tool cover -html=c.out`.
+- **Static analysis:** `go vet`, plus optionally [`staticcheck`](https://staticcheck.dev/).
+- **Debugging:** [Delve](https://github.com/go-delve/delve) (`dlv test`, `dlv debug`) or the editor's debugger. Read goroutine stack traces. Reproduce, hypothesize, and check before changing code.
 
 ### Exercises
 
-1. **You:** Make a table of endpoints and their documented outcomes, and mark which ones have tests. Fill the gaps.
-2. **You:** Ask your pair, or a friend, to introduce a subtle bug such as an off-by-one in pagination or a missing `rows.Err()`. Find it using only tests, logs, and Delve, and explain how you narrowed it down.
-3. **You:** Fuzz `ValidateRecipe` and the JSON decoding helper. Fix anything they find, and keep the crashing inputs as regular test cases.
-4. **You:** Generate a coverage report. Pick one untested error path and decide, with reasons, whether it deserves a test.
-5. **You:** Run `go vet ./...` and `staticcheck ./...`. Understand every finding before you fix it.
+1. **You:** Fuzz `ValidateRecipe` and the JSON decoding helper, and keep any crashing inputs as regular tests.
+2. **You:** Have your pair plant a bug in the Ma's Cooking service, then find it with tests, logs, and Delve.
+3. **Reflect:** Compare the testing experience in xUnit with `WebApplicationFactory` and in Go with `httptest`. Which was faster to write, faster to run, and clearer when it failed?
 
-### Checkpoint
-
-- Which kind of test would catch each of these: a wrong status code, a typo in a SQL column, a validation rule that's off by one, a data race?
-- How do you debug a failing test you don't understand yet?
-- What does fuzzing find that table tests don't?
-
-**References:** [Tutorial: Getting started with fuzzing](https://go.dev/doc/tutorial/fuzz), [`go test` flags](https://pkg.go.dev/cmd/go#hdr-Testing_flags), [Delve getting started](https://github.com/go-delve/delve/blob/master/Documentation/cli/getting_started.md), [Go coverage](https://go.dev/doc/build-cover)
+**References:** [Tutorial: Getting started with fuzzing](https://go.dev/doc/tutorial/fuzz), [Delve](https://github.com/go-delve/delve/blob/master/Documentation/cli/getting_started.md), [Go coverage](https://go.dev/doc/build-cover)
 
 ---
 
-# Part IV: Capstone
+## Appendix A: Gotchas
 
-## Stage 15: Recipe Box API capstone
-
-Build, finish, and explain a small but complete CRUD service. The capstone is not a new product spec for Ma's Cooking. It's a proving ground for the skills the milestones need.
-
-### Scope
-
-- **Speakers:** create, list, and get. Deleting a speaker who still has recipes returns 409.
-- **Recipes:** full CRUD with a `speaker_id` reference, validation, pagination, optimistic locking, and a revision history written inside a transaction.
-- **Health:** `GET /api/health` reports both API and database availability.
-- **Non-goals:** authentication (unless you take that stretch goal), media, a frontend, and deployment. These belong to the Ma's Cooking milestones.
-
-### Suggested layout
-
-Start flat and split only when it helps:
-
-```text
-learning/recipebox/
-  go.mod
-  README.md            how to run, test, and migrate
-  API.md               the contract
-  migrations/
-    0001_init.sql
-    0002_recipe_revisions.sql
-  main.go              config, wiring, server, shutdown
-  routes.go            mux and middleware chain
-  handlers.go          HTTP layer: decode, validate, call store, respond
-  store.go             SQL layer: queries, transactions, error mapping
-  recipe.go            types and validation
-  errors.go            domain errors and the HTTP error helper
-  middleware.go
-  *_test.go
-```
-
-### Definition of done
-
-**Functionality**
-
-- [ ] Every endpoint in `API.md` works as documented, verified with `curl` and with tests.
-- [ ] Lists are paginated, with a stable order and a capped limit.
-- [ ] Updates use version checks, and a stale update returns 409.
-- [ ] Updating a recipe writes a revision row and the recipe change in one transaction.
-
-**Contract and errors**
-
-- [ ] One JSON error shape everywhere, including the field errors from validation.
-- [ ] 400, 404, 409, 413, 422 (or your chosen validation status), 500, and 503 each occur in exactly the documented situations.
-- [ ] 500 responses never expose internal errors. The details are logged with a request ID.
-
-**Data**
-
-- [ ] The schema is fully reproducible from the migrations on an empty database.
-- [ ] Constraints back up every important validation rule.
-- [ ] All SQL is parameterized, and sorting is allowlisted.
-- [ ] Stories and other free text are stored exactly as submitted.
-
-**Tests**
-
-- [ ] Unit tests cover validation, including multi-byte text and exact limits.
-- [ ] Handler tests cover each endpoint's success and documented failures.
-- [ ] Store integration tests run against `recipebox_test` and skip clearly when it isn't configured.
-- [ ] `go test -race ./...` and `go vet ./...` pass. At least one fuzz target exists.
-
-**Operations**
-
-- [ ] Configuration comes from the environment, and startup fails fast on invalid values.
-- [ ] Logs are structured and every request is logged with its status and duration.
-- [ ] Panics are recovered into JSON 500 responses.
-- [ ] Server timeouts and graceful shutdown are in place.
-- [ ] The README lets a stranger set up the database, run the migrations, start the server, and run the tests.
-
-**Code quality**
-
-- [ ] `gofmt` is clean, names are idiomatic, and there are no globals for dependencies.
-- [ ] Every interface has a reason to exist.
-- [ ] The commit history consists of small, meaningful steps.
-
-**Understanding, the part that matters most**
-
-- [ ] Without notes, trace `POST /api/recipes` from `curl` through middleware, the handler, validation, the store, SQL, and the response.
-- [ ] Explain three design decisions you made and one alternative you rejected for each.
-- [ ] Explain one bug you hit, how you found its cause, and how a test now prevents it.
-
-### Capstone review
-
-1. **Self-review** against the definition of done.
-2. **Agent review prompt:**
-
-   > Review learning/recipebox against the Stage 15 definition of done in learning/ROADMAP.md. Report gaps by severity, then correctness issues, then idiomatic Go. Don't fix anything; I'll address each item.
-
-3. **Explain-back session:** The agent asks you to walk through a request, a transaction, and an error path. Record what you could explain unaided in [LEARNING](../docs/LEARNING.md).
-
-### Stretch goals
-
-Each of these previews a Ma's Cooking milestone:
-
-- A tiny Vue and TypeScript page that lists and creates recipes through the API, using a Vite proxy (Milestone 0 and 1).
-- Session-based authentication with recipe ownership enforced in SQL and tests for unauthorized access (Milestone 2).
-- Docker Compose for PostgreSQL so setup is one command.
-- [`sqlc`](https://sqlc.dev/) for one query family, compared with handwritten scanning.
-- CI that runs tests against a PostgreSQL service container.
-- An OpenAPI description generated from, or checked against, `API.md`.
-
----
-
-## Bridge to Ma's Cooking
-
-| Stages | Practice result | Prepares for |
-| --- | --- | --- |
-| 0 to 6 | Exercises in `learning/go/` | The Go foundations phase in the [project roadmap](../docs/ROADMAP.md) |
-| 7 to 8 | The CLI recipe box | The Go foundations exit criteria: a modest program, failure handling, tests, explanation |
-| 9 to 10 | The in-memory HTTP API | Milestone 0: a Go HTTP response and the request path |
-| 11 to 12 | The PostgreSQL-backed API | Milestone 0 database connectivity and health check; Milestone 1 recipe round trip with a migration |
-| 13 | Validation, contract, and concurrency | Milestone 1 invalid-input handling; Milestone 2 lifecycle and access |
-| 14 to 15 | The capstone | Confidence for Milestone 2 onward |
-
-**Choosing a track after the Stage 7 readiness review:**
-
-- **Track A, practice first:** Finish Stages 9 to 15 in `learning/recipebox/`, then build Ma's Cooking. This gives you a safe place to make mistakes, at the cost of building similar things twice.
-- **Track B, learn in the product:** Do Stages 9 to 15 directly as Ma's Cooking Milestones 0 to 2, using this document as lesson notes. You make real progress, but each decision carries product weight and may need an ADR.
-- **Hybrid (a reasonable default):** Do Stage 9 in practice, since an in-memory HTTP API is cheap and disposable, then decide based on how it went.
-
-Whichever track you choose, reconfirm the collaboration mode in [AGENTS.md](../AGENTS.md) before writing application code, and let the [project roadmap](../docs/ROADMAP.md) and [STATUS](../docs/STATUS.md) guide the product work.
-
----
-
-## Appendix A: Gotchas cheat sheet
+### Go
 
 | Gotcha | Symptom | Fix |
 | --- | --- | --- |
-| `:=` shadows `err` or another variable in an inner block | The outer variable never changes, so an error is silently lost | Use `=` for existing variables. Watch the scopes. |
+| `:=` shadows `err` in an inner block | An error is silently lost | Use `=` for existing variables |
 | Writing to a nil map | `panic: assignment to entry in nil map` | `make` the map, usually in a constructor |
-| Slices share a backing array | A change to one slice appears in another | Use `slices.Clone` when you need a separate copy |
+| Slices share a backing array | A change to one slice appears in another | `slices.Clone` |
 | `for _, v := range` gives copies | Changes inside the loop disappear | Index into the slice: `s[i].Field = ...` |
-| A nil slice encodes as JSON `null` | The frontend crashes on `null.map` | Initialize with `[]T{}` |
-| Unexported struct fields | The field is missing from the JSON | Capitalize it and add a `json` tag |
-| A nil pointer inside an interface | `err != nil` even though nothing went wrong | Return a literal `nil` |
-| No `return` after writing an error response | `superfluous response.WriteHeader` in logs, mixed bodies | Always `return` immediately |
-| Setting headers after `WriteHeader` | The header is missing from the response | Set headers first |
-| Forgetting `rows.Close()` or `rows.Err()` | Connections leak, iteration errors are missed | `defer rows.Close()` and check `rows.Err()` |
-| `defer` inside a long loop | Resources pile up until the function returns | Move the loop body into a function |
-| Copying a struct that contains a mutex | Races or deadlocks; `go vet` reports `copylocks` | Use pointer receivers and pass pointers |
-| Map iteration order | Flaky tests | Sort the keys before comparing |
-| `string(65)` | Produces `"A"`, not `"65"` | `strconv.Itoa` |
-| Forgetting `cancel` from `context.WithTimeout` | Leaked timers; `go vet` reports `lostcancel` | `defer cancel()` |
-| Building SQL from user input | SQL injection | Use `$1` placeholders and allowlist identifiers |
-| `timestamp` without a time zone | Times shift unexpectedly | Use `timestamptz` and `time.Time` |
-| Parallel test packages share one database | Random failures in integration tests | Use `go test -p 1` or a database per package |
-| Old tutorials copy loop variables (`i := i`) | Confusing, unnecessary code | Since Go 1.22, each loop iteration gets its own variable |
-| Unbuffered send with no receiver | `fatal error: all goroutines are asleep - deadlock!` | Make sure something receives, or use a buffered channel deliberately |
+| A nil slice encodes as `null` | The Vue page crashes on `null` | Initialize with `[]T{}` |
+| A nil pointer stored in `error` | `err != nil` on success | Return a literal `nil` |
+| No `return` after an error response | `superfluous response.WriteHeader` in logs | Always `return` immediately |
+| Forgetting `rows.Close()` or `rows.Err()` | Leaked connections, missed errors | `defer rows.Close()` and check `rows.Err()` |
+| Copying a struct that contains a mutex | `go vet` reports `copylocks` | Use pointer receivers |
+| Forgetting `cancel()` | `go vet` reports `lostcancel` | `defer cancel()` |
+| Map iteration order | Flaky tests | Sort the keys first |
 
-## Appendix B: Idioms and style
+### C# and ASP.NET Core
 
-- Let `gofmt` decide formatting. Don't argue about it.
-- Names use `MixedCaps`. Short names fit short scopes (`r`, `i`, `err`), and descriptive names fit wider ones.
+| Gotcha | Symptom | Fix |
+| --- | --- | --- |
+| A singleton depending on a scoped service | Stale data or connection errors; caught in Development by `ValidateScopes` | Fix the lifetimes; inject a factory if needed |
+| `IDatabase` registered as a singleton | Crossed transactions and connection errors under load | Register it as scoped |
+| Deferred LINQ evaluated twice or late | Duplicate queries, or results that changed | `ToList()` deliberately |
+| `.Result` or `.Wait()` on a task | Deadlocks and thread-pool starvation | `await` all the way down |
+| A non-UTC `DateTime` written to `timestamptz` | An Npgsql exception | Use UTC, or let the database set defaults |
+| Implicit `[Required]` from nullable reference types | Unexpected 400 responses | Make it optional on purpose with `string?` |
+| An interpolated string in a log message | Logs lose their structured fields | Use message templates |
+| Middleware in the wrong order | CORS or authentication silently not applied | Follow the documented order |
+
+### Vue
+
+| Gotcha | Symptom | Fix |
+| --- | --- | --- |
+| Destructuring a `reactive` object | The values stop updating | `toRefs`, or use `ref` |
+| `v-for` without stable keys | Inputs keep the wrong values after reordering | Key by ID |
+| Treating a route guard as security | Data is exposed when the guard is bypassed | Enforce access on the server |
+| Missing loading and error states | A blank page when the API is down | Handle all four states (V2) |
+
+## Appendix B: Go idioms for a C# developer
+
+- `gofmt` decides formatting. There's no `.editorconfig` to argue about.
+- Names use `MixedCaps`. There's no `I` prefix for interfaces and no `Async` suffix. One-method interfaces end in `-er`, such as `Reader` and `Getter`.
 - Acronyms keep a consistent case: `ID`, `URL`, `HTTP`, as in `recipeID` and `ServeHTTP`.
-- Receiver names are short and consistent, such as `(b *RecipeBook)`, never `this` or `self`.
+- Receiver names are short (`b *RecipeBook`), never `this` or `self`.
 - Error strings are lowercase with no trailing punctuation: `fmt.Errorf("load recipe: %w", err)`.
-- Doc comments are full sentences that start with the name: `// Store persists recipes in PostgreSQL.`
-- Handle errors immediately and keep the success path at the left margin.
-- Return concrete types and accept small interfaces.
+- Return early and keep the success path at the left margin. There are no nested `try` blocks.
+- Return concrete types and accept small interfaces. Don't define an interface per service.
 - Make the zero value useful, or provide `NewX`.
-- Use the standard library first. Add a dependency only to solve a concrete problem.
-- Keep SQL visible. Prefer clear, slightly repetitive code over clever abstraction.
-- Every comment should explain *why* or a constraint the code can't show, not what the next line does.
+- Use the standard library first, and keep SQL visible. Slightly repetitive, clear code is preferred over clever abstraction.
+- A comment explains *why* or a constraint the code can't show. Doc comments start with the name: `// Store persists recipes.`
 
 ## Appendix C: Glossary
 
-- **Backing array:** The array a slice points into.
-- **Composition root:** The single place, usually `main`, where dependencies are created and wired together.
-- **Context:** A value carrying cancellation, deadlines, and request-scoped data through a call chain.
-- **Embedding:** Including a type inside a struct without a field name, which promotes its fields and methods.
-- **Escape analysis:** The compiler's decision about whether a value lives on the stack or the heap.
+- **Backing array:** The array a Go slice points into.
+- **Captive dependency:** A longer-lived service holding a shorter-lived one, in .NET dependency injection.
+- **Composition root:** The single place, `Program.cs` or `main`, where dependencies are wired together.
+- **Context:** Go's carrier for cancellation, deadlines, and request-scoped values. It's the counterpart to `CancellationToken`.
+- **Data Protection:** ASP.NET Core's key management for encrypting cookies and tokens.
+- **Embedding:** Including a type inside a Go struct without a field name, which promotes its methods.
 - **Goroutine:** A lightweight concurrent function managed by the Go runtime.
-- **Handler:** Anything with `ServeHTTP(w, r)`.
+- **Handler:** In Go, anything with `ServeHTTP(w, r)`.
 - **Idempotent:** Repeating the request has the same effect as doing it once.
-- **Integration test:** A test that uses a real dependency, such as PostgreSQL.
 - **Keyset pagination:** Paging by "after this sort key" instead of by offset.
-- **Migration:** A versioned, ordered schema change.
+- **Micro-ORM:** A thin mapper such as NPoco or Dapper: SQL you can see, with automatic row mapping.
 - **Optimistic locking:** Detecting conflicting writes with a version check instead of holding locks.
-- **Rune:** A Unicode code point (`int32`).
+- **ProblemDetails:** The standard JSON error format ([RFC 9457](https://www.rfc-editor.org/rfc/rfc9457)).
+- **Rune:** A Unicode code point in Go (`int32`).
 - **Sentinel error:** A package-level error value compared with `errors.Is`.
 - **SQLSTATE:** PostgreSQL's five-character error code, for example `23505`.
 - **Zero value:** The default value every Go type has.
 
 ## Appendix D: References
 
-All of these are optional. Use them when a concept needs a second explanation.
+All of these are optional.
 
-**Core Go**
+**C# and ASP.NET Core**
 
-- [A Tour of Go](https://go.dev/tour/): an interactive introduction to the language.
-- [Effective Go](https://go.dev/doc/effective_go): idioms and the reasons behind them.
-- [Go by Example](https://gobyexample.com/): short, runnable examples.
-- [The Go Programming Language Specification](https://go.dev/ref/spec): the precise answer to any language question.
-- [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments): common review feedback.
-- [Go doc comments](https://go.dev/doc/comment)
-- [Standard library](https://pkg.go.dev/std)
+- [ASP.NET Core fundamentals](https://learn.microsoft.com/aspnet/core/fundamentals/)
+- [Web API documentation](https://learn.microsoft.com/aspnet/core/web-api/)
+- [C# documentation](https://learn.microsoft.com/dotnet/csharp/)
 
-**Web and data**
+**Data access**
 
-- [`net/http`](https://pkg.go.dev/net/http), [`encoding/json`](https://pkg.go.dev/encoding/json), [`log/slog`](https://pkg.go.dev/log/slog), [`context`](https://pkg.go.dev/context)
-- [Accessing relational databases](https://go.dev/doc/database/)
-- [`pgx`](https://github.com/jackc/pgx)
+- [NPoco wiki](https://github.com/schotime/NPoco/wiki)
+- [Npgsql](https://www.npgsql.org/doc/)
 - [PostgreSQL documentation](https://www.postgresql.org/docs/current/)
+- [DbUp](https://dbup.readthedocs.io/)
+
+**Vue**
+
+- [Vue guide](https://vuejs.org/guide/introduction.html)
+- [Vue Router](https://router.vuejs.org/)
+- [Pinia](https://pinia.vuejs.org/)
+- [Vite](https://vite.dev/)
+- [Vitest](https://vitest.dev/)
+
+**Go**
+
+- [A Tour of Go](https://go.dev/tour/)
+- [Effective Go](https://go.dev/doc/effective_go)
+- [Go by Example](https://gobyexample.com/)
+- [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments)
+- [Standard library](https://pkg.go.dev/std)
+- [`pgx`](https://github.com/jackc/pgx)
+
+**HTTP and security**
+
 - [MDN HTTP guide](https://developer.mozilla.org/en-US/docs/Web/HTTP)
-
-**Quality and security**
-
-- [Data race detector](https://go.dev/doc/articles/race_detector), [Fuzzing](https://go.dev/doc/security/fuzz/), [Delve](https://github.com/go-delve/delve)
-- [OWASP API Security Top 10](https://owasp.org/API-Security/), [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
+- [OWASP API Security Top 10](https://owasp.org/API-Security/)
+- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)

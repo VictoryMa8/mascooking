@@ -11,7 +11,9 @@ The project has two equal goals:
 
 The intended stack is Vue + TypeScript → Go → PostgreSQL, with object storage for media later.
 
-**Current state:** Go foundations in PAIR mode, with small practice programs in [learning/go/](learning/go/README.md). The application has not started. See [STATUS](docs/STATUS.md) for the current task and tooling limitations.
+**How study time is split:** about three quarters goes to C#/ASP.NET Core and Vue, reinforcing the developer's work stack through a practice app called Recipe Box. About one quarter goes to barebones Go and Vue, rebuilding by hand what ASP.NET Core does automatically. That Go work becomes Ma's Cooking. Each concept is learned with the framework first and then built without one. See the [study roadmap](learning/ROADMAP.md).
+
+**Current state:** Go foundations in PAIR mode, with small practice programs in [learning/](learning/README.md). The .NET track and the application haven't started. See [STATUS](docs/STATUS.md) for the current task and tooling limitations.
 
 ## Repository guide
 
@@ -26,12 +28,14 @@ The intended stack is Vue + TypeScript → Go → PostgreSQL, with object storag
 | [docs/LEARNING.md](docs/LEARNING.md)         | Evidence-based learning progress, separate from shipped features      |
 | [docs/decisions/](docs/decisions/)           | Significant accepted decisions and their rationale                    |
 | [docs/plans/](docs/plans/README.md)          | Conventions for larger feature plans in `active/` and `completed/`    |
+| [learning/ROADMAP.md](learning/ROADMAP.md)   | Study plan: .NET + Vue track (~75%) and Go + Vue track (~25%)         |
+| [learning/](learning/README.md)              | Practice code for both tracks, kept separate from the application     |
 
 
 Application folders will be chosen when we implement the skeleton. No empty frontend/backend scaffolds are needed now.
 
 ## Start the next session
 
-> Continue our Go foundations in PAIR mode. Read AGENTS.md, STATUS.md, and LEARNING.md, then inspect learning/go/. Pick up the current exercise, explain one concept, and let me reason through and implement the next small change.
+> Continue my study plan. Read AGENTS.md, STATUS.md, LEARNING.md, and learning/ROADMAP.md, then check the time split in STATUS to decide whether this is a .NET or a Go session. Pick up the current stage, explain one concept, and let me reason through and implement the next small change.
 
 Default workflow: AI plans heavily → developer implements → AI reviews, teaches, and unblocks. Keep commits small and meaningful, such as `initialize Go backend` or `add health endpoint`. Add verified local setup instructions here as they become available.
